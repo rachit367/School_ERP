@@ -1,0 +1,27 @@
+{
+  "name": "school_erp",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/rachit367/School_ERP#readme",
+  "bugs": {
+    "url": "https://github.com/rachit367/School_ERP/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rachit367/School_ERP.git"
+  },
+  "license": "ISC",
+  "author": "rachit",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.0.0"
+  }
+}
