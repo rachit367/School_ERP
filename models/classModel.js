@@ -7,9 +7,9 @@ const classSchema = new mongoose.Schema({
     class_teacher:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
     teachers:[{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
     students:[{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
-    timetable_url: { type: String },   // PDF / doc / link
-    syllabus_url: { type: String },    // PDF / doc / link
-    exam_url: { type: String }        // optional link to exam schedule or resources
+    timetable: {type:{ name:String,url:String }},   // PDF / doc / link
+    syllabus: {type:{ name:String,url:String }},    // PDF / doc / link
+    exam: {type:{ name:String,url:String }}        // optional link to exam schedule or resources
 
 },{timestamps:true})
 
