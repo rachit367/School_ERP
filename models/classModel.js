@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const classSchema = new mongoose.Schema({
     school_id:{type:mongoose.Schema.ObjectId,ref:'School', required:true},
-    class:{type:String,required:true},
-    section:String,
+    class_name:{type:String,required:true},
+    section:{type:String,set: v => v.replace(/\b\w/g, c => c.toUpperCase())},
     class_teacher:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
     teachers:[{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
     students:[{type:mongoose.Schema.Types.ObjectId,ref:'User'}],

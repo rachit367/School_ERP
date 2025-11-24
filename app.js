@@ -5,7 +5,7 @@ const express=require('express')
 const app=express()
 const errorHandling=require('./middlewares/errorHandling')
 const allowedOrigins=process.env.ALLOWED_ORIGINS.split(',')
-
+const authRouter=require('./routes/authRouter')
 connectDB()
 
 app.use(cors({
@@ -22,6 +22,9 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+
+
+app.use('/api/auth',authRouter)
 
 
 app.use(errorHandling)

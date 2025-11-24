@@ -1,13 +1,14 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
-    name:{
+    name:{   
         type:String,
-        required:true
+        required:true,
+        set: v => v.replace(/\b\w/g, c => c.toUpperCase())        //first letter of every word capital
     },
-    phone:{
+    phone:{                                                       //10 digit no spaces
         type:Number,
-        required:true
+        required:true 
     },
     email:{
         type:String,
@@ -26,21 +27,21 @@ const userSchema = new mongoose.Schema({
         father_name:String,
         mother_name:String,
         class_id:{type:mongoose.Schema.Types.ObjectId,ref:'Class'},
-        roll_number:{type:String ,required:true},
-        attendance_percentage:Number
+        roll_number:{type:String ,required:true}
     },
      // ---------- TEACHER PROFILE ----------
     teacherProfile:{
         employee_id:{type:String,required:true},
         class_teacher_of:{type:mongoose.Schema.Types.ObjectId,ref:'Class'},
         classes_assigned:[{type:mongoose.Schema.Types.ObjectId,ref:'Class'}],
-        timetable:String,
+        timetable_url:String,         //amke the url always unique while uploading on aws
         designation:{
             type:String,
             enum:['ST','Mentor'],        //add manager and small roles of other employees here 
             required:true
         },
-        annoucement_allowed:{type:Boolean,default:false}    
+        annoucement_allowed:{type:Boolean,default:false},
+        refreshToken:String    
     }
 },{timestamps:true})
 
