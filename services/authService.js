@@ -17,8 +17,8 @@ async function sendOtpService(phone, name) {
 
     await otpModel.findOneAndUpdate(
         { phone: normalizedPhone },
-        { otp: hashedOtp, createdAt: new Date() },
-        { upsert: true }
+        { otp: hashedOtp, name:capitalName ,expires_at: new Date(Date.now() + 5*60*1000) },
+        { upsert: true }                    //if multiple otp are generted it will replace them and i have unique numebr so every number will have one otp for 5 min
     );
 
     // Send OTP with your SMS provider here
@@ -27,7 +27,7 @@ async function sendOtpService(phone, name) {
     return { statuscode: 200, message: "OTP sent successfully" };
 }
 
-async function verifyOtpService(otp, phone, name) {
+async function verifyOtpService(otp, phone) {
     const normalizedPhone = normalizePhone(phone);
     const hashedOtpFromDB = await otpModel.findOne({ phone: normalizedPhone });
 
@@ -40,7 +40,7 @@ async function verifyOtpService(otp, phone, name) {
         return { success: false, message: "Invalid OTP" };
     }
 
-    const capitalName = capitalizeEveryWord(name);
+    const capitalName = hashedOtpFromDB.name
     const user = await userModel.findOne({ name: capitalName, phone: normalizedPhone });
 
     if (!user) {
@@ -64,10 +64,15 @@ async function verifyOtpService(otp, phone, name) {
     };
 }
 
-async function refreshTokenService(refreshToken) {
+async function refreshTokenService(refreshToken) {     // use refresh token rotation for better security afterwards
     if (!refreshToken) return { success: false, message: "Refresh token required" };
 
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    let decoded;
+    try {
+        decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+        return { success: false, message: "Invalid or expired refresh token" };
+    }
     const user = await userModel.findById(decoded.user_id);
 
     if (!user || user.refreshToken !== refreshToken) {

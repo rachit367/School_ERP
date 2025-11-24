@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const otpSchema = new mongoose.Schema({
     phone:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     otp:{
         type:String,   //store otp in hashes
@@ -13,6 +14,10 @@ const otpSchema = new mongoose.Schema({
         type:Date,
         default:()=> new Date(Date.now() + 5 * 60 * 1000),
         index:{expires:'5m'}
+    },
+    name:{
+        type:String,
+        set: v => v.replace(/\b\w/g, c => c.toUpperCase())
     }
 },{timestamps:true})
 
