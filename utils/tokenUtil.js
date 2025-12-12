@@ -2,7 +2,7 @@ const jwt=require('jsonwebtoken')
 
 function generateAccessToken(user){
     try{
-        const accessToken=jwt.sign({user_id:user._id,role:user.role},process.env.ACCESS_TOKEN_SECRET,{expiresIn:'15m'})
+        const accessToken=jwt.sign({user_id:user._id,role:user.role},process.env.ACCESS_TOKEN_SECRET,{expiresIn:'30m'})
         return accessToken
     }catch(err){
         next(err)

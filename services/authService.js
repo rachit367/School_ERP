@@ -5,12 +5,13 @@ const jwt = require('jsonwebtoken');
 const { generateAccessToken, generateRefreshToken } = require('../utils/tokenUtil');
 const { capitalizeEveryWord, normalizePhone } = require('../utils/loginUtils');
 
+//req:phone,name  //res:statusCode,message
 async function sendOtpService(phone, name) {
     const normalizedPhone = normalizePhone(phone);
     const capitalName = capitalizeEveryWord(name);
 
     const user = await userModel.findOne({ name: capitalName, phone: normalizedPhone });
-    if (!user) return { statuscode: 401, message: "User not found" };
+    if (!user) return { statusCode: 401, message: "User not found" };
 
     const otp = generateOtp();
     const hashedOtp = hashOtp(otp);
@@ -18,16 +19,17 @@ async function sendOtpService(phone, name) {
     await otpModel.findOneAndUpdate(
         { phone: normalizedPhone },
         { otp: hashedOtp, name:capitalName ,expires_at: new Date(Date.now() + 5*60*1000) },
-        { upsert: true }                    //if multiple otp are generted it will replace them and i have unique numebr so every number will have one otp for 5 min
+        { upsert: true }                    //if multiple otp are generted it will replace the previous ones and 1 phone  number will have one otp for 5 min
     );
 
     // Send OTP with your SMS provider here
     console.log("OTP for testing:", otp);
 
-    return { statuscode: 200, message: "OTP sent successfully" };
+    return { statusCode: 200, message: "OTP sent successfully" };
 }
 
-async function verifyOtpService(otp, phone) {
+//req:otp,phone //res:sucess,message,accessToken,refreshToken,user
+async function verifyOtpService(otp, phone) { 
     const normalizedPhone = normalizePhone(phone);
     const hashedOtpFromDB = await otpModel.findOne({ phone: normalizedPhone });
 
@@ -54,16 +56,18 @@ async function verifyOtpService(otp, phone) {
     await user.save();
 
     await otpModel.deleteOne({ phone: normalizedPhone }); // delete used OTP
-
+    const fullUser = user.toObject();
+    delete fullUser.refreshToken;
     return {
         success: true,
         message: "OTP verified",
         accessToken,
         refreshToken,
-        user
+        user:fullUser
     };
 }
 
+//req:refreshToken  //res:success,accessToken
 async function refreshTokenService(refreshToken) {     // use refresh token rotation for better security afterwards
     if (!refreshToken) return { success: false, message: "Refresh token required" };
 

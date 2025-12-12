@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
             required:true
         },
         annoucement_allowed:{type:Boolean,default:false},
-        refreshToken:String    
+        refreshToken:String    // make it store with bcrypt afterwards for security purpose
     }
 },{timestamps:true})
 

@@ -11,10 +11,14 @@ const announcementSchema = new mongoose.Schema({
         ref:'User',
         required:true
     },
-    class_id:[{
+    class_id:[{  //if empty for whole school
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Class',  //if empty visible to whole school
+        ref:'Class',    
     }],
+    title:{
+        type:String,
+        required:true
+    },
     message:{
         type:String,
         trim:true
