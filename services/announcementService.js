@@ -5,6 +5,7 @@ const classModel=require('./../models/classModel')
 //req:   //res: [_id, messsage,title,createdAt,_id]
 async function handleGetSchoolAnnouncements(user_id){
     const user=await userModel.findById(user_id)
+    if (user.role === 'Student') return [];
     const announcements=await announcementModel.find({school_id:user.school_id})
     .select("message title createdAt _id")
     .sort({createdAt:-1})
@@ -26,6 +27,12 @@ async function handleGetClassAnnouncements(user_id){
 //req:topic,school:[true,false],class:[],description //res:success
 async function handleCreateAnnouncement(topic,school,classes,description,user_id){
     const user=await userModel.findById(user_id)
+    if(user.role==='Student'){
+        return {success:false}
+    }
+    if(user.role==='Teacher' && user.teacherProfile.announcement_allowed===false){
+        return {success:false}
+    }
     if(school===true){
         const announcement=await announcementModel.create({
             school_id:user.school_id,
@@ -63,9 +70,32 @@ async function handleGetAnnouncements(_id) {
     }
 }
 //req:_id //res:success
-async function handleDeleteAnnouncement(_id) {
+async function handleDeleteAnnouncement(_id,user_id) {
+    const user=await userModel.findById(user_id)
+    if(user.role==='Student'){
+        return {success:false}
+    }
+    if(user.role==='Teacher' && user.teacherProfile.announcement_allowed===false){
+        return {success:false}
+    }
     const announcement=await announcementModel.findByIdAndDelete(_id)
     return {success:true}
 }
 
-module.exports={handleCreateAnnouncement,handleDeleteAnnouncement,handleGetAnnouncements,handleGetClassAnnouncements,handleGetSchoolAnnouncements}
+//req:teacher_id  //res:success
+async function handleAssignTeacher(id) {
+    await userModel.findByIdAndUpdate(
+  id,
+  { $set: { 'teacherProfile.announcement_allowed': true } }
+);
+}
+
+//req:teacher_id  //res:success
+async function handleRemoveTeacher(id) {
+    await userModel.findByIdAndUpdate(
+  id,
+  { $set: { 'teacherProfile.announcement_allowed': false } }
+);
+}
+
+module.exports={handleCreateAnnouncement,handleDeleteAnnouncement,handleGetAnnouncements,handleGetClassAnnouncements,handleGetSchoolAnnouncements,handleRemoveTeacher,handleAssignTeacher}

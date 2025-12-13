@@ -3,7 +3,9 @@ const {
     handleDeleteAnnouncement,
     handleGetAnnouncements,
     handleGetClassAnnouncements,
-    handleGetSchoolAnnouncements
+    handleGetSchoolAnnouncements,
+    handleAssignTeacher,
+    handleRemoveTeacher
 } = require("./../services/announcementService");
 //req:   //res: [_id, message, title, createdAt, _id]
 async function getSchoolAnnouncements(req, res, next) {
@@ -82,12 +84,35 @@ async function deleteAnnouncement(req, res, next) {
     try {
         const { id } = req.params;
 
-        await handleDeleteAnnouncement(id);
-
+        await handleDeleteAnnouncement(id,req.user_id);
         return res.status(200).json({ success: true });
 
     } catch (err) {
         next(err);
+    }
+}
+//req:teacher_id  //res:success
+async function assignTeacher(req,res,next) {
+    try{
+        const id=req.params.id
+        await handleAssignTeacher(id)
+        return res.json({
+            success:true
+        })
+    }catch(err){
+        next(err)
+    }
+}
+//req:teacher_id  //res:success
+async function removeTeacher(req,res,next) {
+    try{
+        const id =req.params.id
+        await handleRemoveTeacher(id)
+        return res.json({
+            success:true
+        })
+    }catch(err){
+        next(err)
     }
 }
 
@@ -96,5 +121,7 @@ module.exports = {
     getClassAnnouncements,
     createAnnouncement,
     getAnnouncementById,
-    deleteAnnouncement
+    deleteAnnouncement,
+    removeTeacher,
+    assignTeacher
 };

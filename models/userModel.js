@@ -34,13 +34,13 @@ const userSchema = new mongoose.Schema({
         employee_id:{type:String,required:true},
         class_teacher_of:{type:mongoose.Schema.Types.ObjectId,ref:'Class'},
         classes_assigned:[{type:mongoose.Schema.Types.ObjectId,ref:'Class'}],
-        timetable_url:String,         //amke the url always unique while uploading on aws
+        timetable_url:String,         //make the url always unique while uploading on aws
         designation:{
             type:String,
             enum:['ST','Mentor'],        //add manager and small roles of other employees here 
             required:true
         },
-        annoucement_allowed:{type:Boolean,default:false},
+        announcement_allowed:{type:Boolean,default:false},
         refreshToken:String    // make it store with bcrypt afterwards for security purpose
     }
 },{timestamps:true})
