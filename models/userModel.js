@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
         timetable_url:String,         //make the url always unique while uploading on aws
         designation:{
             type:String,
-            enum:['ST','Mentor']     
+            enum:['ST','Mentor']      
         },
         subjects:[{
             type:String,

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('./../middlewares/authMiddleware');
-const {getAllTeachers,getTeacher,deleteTeacher,createTeacher}=require('../controllers/principalUserTeacherController');
+const {getAllTeachers,getTeacher,deleteTeacher,createTeacher,updateTeacher}=require('../controllers/principalUserTeacherController');
 
 router.use(authenticateToken);
 
@@ -14,7 +14,9 @@ router.get('/users/teachers/:id',getTeacher)
 //req:teacher_id  //res:{success}
 router.delete('/users/teachers/:id',deleteTeacher)
 
-//req:name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects  //res:{success,message}
+//req:name,email,role,employee_id,class_teacher_of,classes_assigned,subjects  //res:{success,message}
 router.post('/users/teachers',createTeacher)
+
+router.put('/users/teachers/:id',updateTeacher)
 
 module.exports=router

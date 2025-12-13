@@ -77,9 +77,10 @@ async function handleDeleteTeacher(teacher_id) {
 }
 
 //req:name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects  //res:{success,message}
-async function handleCreateTeacher(user_id,name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects){
+async function handleCreateTeacher(user_id,name,email,role,employee_id,class_teacher_of,classes_assigned,subjects){
     const user=await userModel.findById(user_id)
     .select('school_id');
+    const designation = class_teacher_of ? 'Mentor' : 'ST';
     let classTeacherOfId = null;
     if (class_teacher_of) {
         classTeacherOfId = await getClassId(class_teacher_of, user.school_id);
@@ -108,9 +109,51 @@ async function handleCreateTeacher(user_id,name,email,role,employee_id,class_tea
     return {success:true,message:"Teacher created successfully"}
 } 
 
+async function handleUpdateTeacher(teacher_id,payload) {
+    const teacher=await userModel.findById(teacher_id)
+    .select('email teacherProfile school_id')
+    const school_id=teacher.school_id
+    const profile=teacher.teacherProfile
+    if(payload.class_teacher_of!==undefined){
+        if(payload.class_teacher_of){
+            const classID=await getClassId(payload.class_teacher_of,school_id)
+            profile.class_teacher_of=classID
+        }else{
+            profile.class_teacher_of=null
+        }
+        if (profile.class_teacher_of) {
+            profile.designation = 'Mentor';
+        } else {
+            profile.designation = 'ST';
+        }
+    }
+        
+    if (Array.isArray(payload.classes_assigned)) {
+        const classIds = [];
+
+        for (let cls of payload.classes_assigned) {
+            const classId = await getClassId(cls, school_id);
+            classIds.push(classId);
+        }
+
+        profile.classes_assigned = classIds;
+    }
+
+    if (Array.isArray(payload.subjects)) {
+        profile.subjects = payload.subjects;
+    }
+    teacher.teacherProfile=profile
+    await teacher.save()
+    return {
+        success: true,
+        message: "Teacher updated successfully"
+    };
+
+}
 module.exports={
     handleGetAllTeachers,
     handleGetTeacher,
     handleCreateTeacher,
-    handleDeleteTeacher
+    handleDeleteTeacher,
+    handleUpdateTeacher
 }

@@ -1,5 +1,5 @@
 
-const { handleGetAllTeachers,handleGetTeacher,handleCreateTeacher,handleDeleteTeacher} = require('./../services/principalUserTeacherService')
+const { handleGetAllTeachers,handleGetTeacher,handleCreateTeacher,handleDeleteTeacher,handleUpdateTeacher} = require('./../services/principalUserTeacherService')
 
 //req:  //res: [{ _id, name, role, designation, subjects, classes_assigned }]
 async function getAllTeachers(req,res,next) {
@@ -54,9 +54,19 @@ async function createTeacher(req,res,next){
     }
 }
 
+//req:teacher_id //res:{success}
 async function deleteTeacher(req,res,next) {
     try{
         const response=await handleDeleteTeacher(req.params.id)
+        return res.json(response)
+    }catch(err){
+        next(err)
+    }
+}
+
+async function updateTeacher(req,res,next){
+    try{    
+        const response=await handleUpdateTeacher(req.params.id,req.body)
         return res.json(response)
     }catch(err){
         next(err)
@@ -66,5 +76,6 @@ module.exports = {
     getAllTeachers,
     getTeacher,
     deleteTeacher,
-    createTeacher
+    createTeacher,
+    updateTeacher
 }
