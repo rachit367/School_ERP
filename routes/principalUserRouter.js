@@ -17,6 +17,7 @@ router.delete('/users/teachers/:id',deleteTeacher)
 //req:name,email,role,employee_id,class_teacher_of,classes_assigned,subjects  //res:{success,message}
 router.post('/users/teachers',createTeacher)
 
-router.put('/users/teachers/:id',updateTeacher)
+// req: teacher_id, { class_teacher_of, classes_assigned, subjects }  // res: { success, message }
+router.put('/users/teachers/:id',updateTeacher)  //optional fields are there
 
 module.exports=router

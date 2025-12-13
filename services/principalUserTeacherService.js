@@ -111,7 +111,7 @@ async function handleCreateTeacher(user_id,name,email,role,employee_id,class_tea
 
 async function handleUpdateTeacher(teacher_id,payload) {
     const teacher=await userModel.findById(teacher_id)
-    .select('email teacherProfile school_id')
+    .select('teacherProfile school_id')
     const school_id=teacher.school_id
     const profile=teacher.teacherProfile
     if(payload.class_teacher_of!==undefined){

@@ -34,7 +34,6 @@ async function createTeacher(req,res,next){
             employee_id,
             class_teacher_of,
             classes_assigned,
-            designation,
             subjects
         } = req.body;
         const response = await handleCreateTeacher(
@@ -45,7 +44,6 @@ async function createTeacher(req,res,next){
             employee_id,
             class_teacher_of,
             classes_assigned,
-            designation,
             subjects
         );
         return res.json(response);
