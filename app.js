@@ -29,7 +29,7 @@ app.use(express.urlencoded({extended:true}));
 
 app.use('/api/auth',authRouter)
 app.use('/api/announcement',announcementRouter)
-app.use('/api/principal/users',principalUserRouter)
+app.use('/api/principal',principalUserRouter)
 app.use(errorHandling)
 
 

@@ -27,19 +27,22 @@ const userSchema = new mongoose.Schema({
         father_name:String,
         mother_name:String,
         class_id:{type:mongoose.Schema.Types.ObjectId,ref:'Class'},
-        roll_number:{type:String ,required:true}
+        roll_number:{type:String }
     },
      // ---------- TEACHER PROFILE ----------
     teacherProfile:{
-        employee_id:{type:String,required:true},
+        employee_id:{type:String},
         class_teacher_of:{type:mongoose.Schema.Types.ObjectId,ref:'Class'},
         classes_assigned:[{type:mongoose.Schema.Types.ObjectId,ref:'Class'}],
         timetable_url:String,         //make the url always unique while uploading on aws
         designation:{
             type:String,
-            enum:['ST','Mentor'],        //add manager and small roles of other employees here 
-            required:true
+            enum:['ST','Mentor']     
         },
+        subjects:[{
+            type:String,
+            set: v => v.replace(/\b\w/g, c => c.toUpperCase())
+        }],
         announcement_allowed:{type:Boolean,default:false},
         refreshToken:String    // make it store with bcrypt afterwards for security purpose
     }

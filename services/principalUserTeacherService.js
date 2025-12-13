@@ -1,0 +1,116 @@
+const userModel=require('../models/userModel')
+const getClassId=require('./../utils/classIdUtil')
+
+//req:  //res: [{ _id, name, role, designation, subjects, classes_assigned }]
+async function handleGetAllTeachers(user_id) {
+    const user=await userModel.findById(user_id).select('school_id')
+    const teachers=await userModel.find({
+        school_id:user.school_id,
+        role:'Teacher'})
+        .populate({path:'teacherProfile.classes_assigned',select:'class_name section'})
+        .select(`
+            _id
+            name
+            role
+            teacherProfile.designation
+            teacherProfile.subjects
+            teacherProfile.classes_assigned
+        `)
+    return teachers.map(t=>({
+        _id:t._id,
+        name:t.name,
+        role:t.role,
+        designation:t.teacherProfile?.designation ?? '',
+        subjects:t.teacherProfile?.subjects ?? [],
+        classes_assigned: (t.teacherProfile?.classes_assigned || []).map(c => `${c.class_name}-${c.section}`)
+    }))
+
+}
+
+// req: teacher_id  //res: { _id,name, phone, email, employee_id, designation, subjects, class_teacher_of, classes_assigned }
+async function handleGetTeacher(teacher_id) {
+    const teacher=await userModel.findById(teacher_id)
+    .populate([
+        {
+            path:'teacherProfile.class_teacher_of',
+            select:'section class_name'
+        },
+        {
+            path:'teacherProfile.classes_assigned',
+            select:'section class_name'
+        }
+    ])
+    .select(
+        `
+        name
+        phone
+        email
+        teacherProfile.employee_id
+        teacherProfile.designation
+        teacherProfile.subjects
+        teacherProfile.class_teacher_of
+        teacherProfile.classes_assigned
+        `
+    )
+    return {
+    _id:teacher._id,
+    name: teacher.name,
+    phone: teacher.phone,
+    email: teacher.email,
+    employee_id: teacher.teacherProfile?.employee_id ?? '',
+    designation: teacher.teacherProfile?.designation ?? '',
+    subjects: teacher.teacherProfile?.subjects ?? [],
+    //  single class
+    class_teacher_of: teacher.teacherProfile?.class_teacher_of
+        ? `${teacher.teacherProfile.class_teacher_of.class_name}-${teacher.teacherProfile.class_teacher_of.section}`
+        : '',
+    //  multiple classes
+    classes_assigned: (teacher.teacherProfile?.classes_assigned || [])
+        .map(c => `${c.class_name}-${c.section}`)
+    }
+}
+
+//req:teacher_id //res:{success}
+async function handleDeleteTeacher(teacher_id) {
+    await userModel.deleteOne({_id:teacher_id})
+    return {success:true}
+}
+
+//req:name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects  //res:{success,message}
+async function handleCreateTeacher(user_id,name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects){
+    const user=await userModel.findById(user_id)
+    .select('school_id');
+    let classTeacherOfId = null;
+    if (class_teacher_of) {
+        classTeacherOfId = await getClassId(class_teacher_of, user.school_id);
+    }
+    let assignedClassIds = [];
+    if (Array.isArray(classes_assigned) && classes_assigned.length > 0) {
+        assignedClassIds = await Promise.all(
+            classes_assigned.map(cls =>
+                getClassId(cls, user.school_id)
+            )
+        );
+    }
+    const teacher=await userModel.create({
+        name:name,
+        email:email,
+        role:role,
+        school_id:user.school_id,
+        teacherProfile:{
+            employee_id:employee_id,
+            class_teacher_of:classTeacherOfId,
+            classes_assigned:assignedClassIds,
+            designation:designation,
+            subjects:subjects
+        }
+    });
+    return {success:true,message:"Teacher created successfully"}
+} 
+
+module.exports={
+    handleGetAllTeachers,
+    handleGetTeacher,
+    handleCreateTeacher,
+    handleDeleteTeacher
+}
