@@ -26,6 +26,13 @@ const userSchema = new mongoose.Schema({
     studentProfile:{
         father_name:String,
         mother_name:String,
+        father_email:String,
+        father_number:Number,
+        mother_number:Number,
+        mother_email:String,
+        guardian_name:String,
+        guardian_email:String,
+        guardian_number:String,
         class_id:{type:mongoose.Schema.Types.ObjectId,ref:'Class'},
         roll_number:{type:String },
         total_presents:{type:Number,default:0},

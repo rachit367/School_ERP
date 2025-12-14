@@ -20,11 +20,25 @@ router.post('/users/teachers',createTeacher)
 // req: teacher_id, { class_teacher_of, classes_assigned, subjects }  // res: { success, message }
 router.put('/users/teachers/:id',updateTeacher)  //optional fields are there
 
+//--------------STUDENTS--------------
 
+//req:school_id  //res:class_name,total_students,total_sections
 router.get('/users/students/classes')
+
 
 router.get('/users/students/classes/sections')
 
-router.get('/users/students/')
+
+router.get('/users/students/classes/section/all')
+
+
+router.get('/users/students/:id')
+
+
+router.post('/users/students')
+
+
+
+
 
 module.exports=router
