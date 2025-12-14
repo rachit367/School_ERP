@@ -27,7 +27,9 @@ const userSchema = new mongoose.Schema({
         father_name:String,
         mother_name:String,
         class_id:{type:mongoose.Schema.Types.ObjectId,ref:'Class'},
-        roll_number:{type:String }
+        roll_number:{type:String },
+        total_presents:{type:Number,default:0},
+        total_absents:{type:Number,default:0}
     },
      // ---------- TEACHER PROFILE ----------
     teacherProfile:{

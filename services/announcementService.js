@@ -1,6 +1,7 @@
 const announcementModel=require('./../models/announcementModel')
 const userModel=require('./../models/userModel')
 const classModel=require('./../models/classModel')
+const getClassId=require('./../utils/classIdUtil')
 
 //req:   //res: [_id, messsage,title,createdAt,_id]
 async function handleGetSchoolAnnouncements(user_id){
@@ -17,7 +18,7 @@ async function handleGetClassAnnouncements(user_id){
     const announcements=await announcementModel.find({school_id: user.school_id,
         $or: [
             { class_id: user.studentProfile.class_id }, // class announcements
-            { class_id: { $size: 0 } }                 // school-wide announcements
+            { class_id: { $exists: true, $eq: [] } }                 // school-wide announcements
         ]})
     .select("title message createdAt _id")
     .sort({createdAt:-1})
@@ -45,7 +46,7 @@ async function handleCreateAnnouncement(topic,school,classes,description,user_id
             success:true
         }
     }
-    const Classes=await classModel.find({school_id:user.school_id,class_name:{$in:classes}}).select("_id")
+    const Classes=await Promise.all(classes.map(c=>getClassId(c,user.school_id)));
     const announcement=await announcementModel.create({
         school_id:user.school_id,
         title:topic,

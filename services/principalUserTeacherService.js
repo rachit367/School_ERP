@@ -1,5 +1,6 @@
 const userModel=require('../models/userModel')
 const getClassId=require('./../utils/classIdUtil')
+const classModel=require('./../models/classModel')
 
 //req:  //res: [{ _id, name, role, designation, subjects, classes_assigned }]
 async function handleGetAllTeachers(user_id) {
@@ -106,24 +107,51 @@ async function handleCreateTeacher(user_id,name,email,role,employee_id,class_tea
             subjects:subjects
         }
     });
+    if (classTeacherOfId!==null){
+        await classModel.findByIdAndUpdate(classTeacherOfId,{class_teacher:teacher._id})
+    }
     return {success:true,message:"Teacher created successfully"}
 } 
 
 async function handleUpdateTeacher(teacher_id,payload) {
     const teacher=await userModel.findById(teacher_id)
-    .select('teacherProfile school_id')
+    .select('teacherProfile school_id _id')
+
     const school_id=teacher.school_id
     const profile=teacher.teacherProfile
+
     if(payload.class_teacher_of!==undefined){
-        if(payload.class_teacher_of){
-            const classID=await getClassId(payload.class_teacher_of,school_id)
-            profile.class_teacher_of=classID
-        }else{
-            profile.class_teacher_of=null
-        }
+    // 1️⃣ Remove teacher from old class (if any)
         if (profile.class_teacher_of) {
+            await classModel.findByIdAndUpdate(
+                profile.class_teacher_of,
+                { class_teacher: null }
+            );
+        }
+
+        // 2️⃣ Assign new class (if provided)
+        if (payload.class_teacher_of) {
+            const classID = await getClassId(payload.class_teacher_of, school_id);
+            const CLASS = await classModel.findById(classID);
+
+            // remove previous teacher of this class
+            if (CLASS.class_teacher) {
+                await userModel.findByIdAndUpdate(
+                    CLASS.class_teacher,
+                    { 'teacherProfile.class_teacher_of': null }
+                );
+            }
+
+            // assign
+            profile.class_teacher_of = classID;
+            await classModel.findByIdAndUpdate(
+                classID,
+                { class_teacher: teacher_id }
+            );
+
             profile.designation = 'Mentor';
         } else {
+            profile.class_teacher_of = null;
             profile.designation = 'ST';
         }
     }
