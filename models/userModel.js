@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
     date_of_birth:{
         type:Date
     },
+    refreshToken:String,    // make it store with bcrypt afterwards for security purpose
      // ---------- STUDENT PROFILE ----------
     studentProfile:{
         father_name:String,
@@ -57,7 +58,6 @@ const userSchema = new mongoose.Schema({
             set: v => v.replace(/\b\w/g, c => c.toUpperCase())
         }],
         announcement_allowed:{type:Boolean,default:false},
-        refreshToken:String    // make it store with bcrypt afterwards for security purpose
     }
 },{timestamps:true})
 

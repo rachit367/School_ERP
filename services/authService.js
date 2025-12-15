@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { generateAccessToken, generateRefreshToken } = require('../utils/tokenUtil');
 const { capitalizeEveryWord, normalizePhone } = require('../utils/loginUtils');
 
+
 //req:phone,name  //res:statusCode,message
 async function sendOtpService(phone, name) {
     const normalizedPhone = normalizePhone(phone);
@@ -69,30 +70,42 @@ async function verifyOtpService(otp, phone) {
 
 //req:refreshToken  //res:success,accessToken
 async function refreshTokenService(refreshToken) {     // use refresh token rotation for better security afterwards
-    if (!refreshToken) return { success: false, message: "Refresh token required" };
-
     let decoded;
     try {
-        decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      decoded = jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET
+      );
     } catch (err) {
-        return { success: false, message: "Invalid or expired refresh token" };
+      return {
+        success: false,
+        message: 'Invalid or expired refresh token'
+      };
     }
     const user = await userModel.findById(decoded.user_id);
-
     if (!user || user.refreshToken !== refreshToken) {
-        return { success: false, message: "Invalid refresh token" };
+      return {
+        success: false,
+        message: 'Invalid refresh token'
+      };
     }
-
-    const newAccessToken = generateAccessToken(user);
-
+    const accessToken = generateAccessToken(user);
     return {
-        success: true,
-        accessToken: newAccessToken
+      success: true,
+      accessToken
     };
+}
+//req:    //res:user
+async function handleGetUserDetails(user_id){
+    let user=await userModel.findById(user_id)
+    const fullUser=user.toObject();
+    delete fullUser.refreshToken
+    return fullUser
 }
 
 module.exports = {
     sendOtpService,
+    handleGetUserDetails,
     verifyOtpService,
     refreshTokenService
 };

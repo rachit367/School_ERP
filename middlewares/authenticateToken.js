@@ -19,10 +19,10 @@ async function authenticateToken(req,res,next){
         next()
     }catch(err){
         if (err.name === "TokenExpiredError") {
-            err.statusCode = 403;
+            err.statusCode = 401;
             err.message = "Access token expired";
         } else {
-            err.statusCode = 403;
+            err.statusCode = 401;
             err.message = "Invalid access token";
         }
         return next(err);

@@ -12,6 +12,14 @@ const schoolSchema=new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         required:true
+    },
+    total_students:{
+        type:Number,
+        min:0
+    },
+    total_teachers:{
+        type:Number,
+        min:0
     }
 },{timestamps:true})
 
