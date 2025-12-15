@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('./../middlewares/authMiddleware');
 const {getAllTeachers,getTeacher,deleteTeacher,createTeacher,updateTeacher}=require('../controllers/principalUserTeacherController');
+const {
+    getClasses,
+    getSections,
+    getStudentsInSection,
+    getStudentDetails,
+    addStudent,
+    deleteStudent,
+    transferStudent
+} = require('../controllers/studentController');
 
 router.use(authenticateToken);
 
@@ -20,23 +29,40 @@ router.post('/users/teachers',createTeacher)
 // req: teacher_id, { class_teacher_of, classes_assigned, subjects }  // res: { success, message }
 router.put('/users/teachers/:id',updateTeacher)  //optional fields are there
 
-//--------------STUDENTS--------------
 
-//req:school_id  //res:class_name,total_students,total_sections
-router.get('/users/students/classes')
+// ===================== CLASSES =====================
 
+// req: — (school inferred from user OR pass school_id for now)
+// res: [{ class_name, total_students, total_sections }]
+router.get('/users/classes', getClasses);
 
-router.get('/users/students/classes/sections')
-
-
-router.get('/users/students/classes/section/all')
-
-
-router.get('/users/students/:id')
+// req: class_name
+// res: [{ section, class_teacher, total_students, _id }]
+router.get('/users/classes/:class_name/sections', getSections);
 
 
-router.post('/users/students')
 
+// ===================== STUDENTS =====================
+
+// req: class_id
+// res: [{ _id, name, roll_number }]
+router.get('/users/classes/:class_id/students', getStudentsInSection);
+
+// req: student_id
+// res: { student_id, name, number, attendance, class, section, ... }
+router.get('/users/students/:student_id', getStudentDetails);
+
+// req: name, class_name, section, dob, roll_number, parent details, email, phone
+// res: { success }
+router.post('/users/students', addStudent);
+
+// req: student_id
+// res: { success }
+router.delete('/users/students/:student_id', deleteStudent);
+
+// req: student_id, section
+// res: { success }
+router.patch('/users/students/:student_id/transfer', transferStudent);
 
 
 

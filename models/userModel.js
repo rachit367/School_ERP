@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
         required:true,
         set: v => v.replace(/\b\w/g, c => c.toUpperCase())        //first letter of every word capital
     },
-    phone:{                                                       //10 digit no spaces
+    phone:{                         //10 digit no spaces
         type:Number,
         required:true 
     },
@@ -20,7 +20,11 @@ const userSchema = new mongoose.Schema({
     },
     school_id:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'School'
+        ref:'School',
+        require:true
+    },
+    date_of_birth:{
+        type:Date
     },
      // ---------- STUDENT PROFILE ----------
     studentProfile:{
@@ -32,7 +36,7 @@ const userSchema = new mongoose.Schema({
         mother_email:String,
         guardian_name:String,
         guardian_email:String,
-        guardian_number:String,
+        guardian_number:Number,
         class_id:{type:mongoose.Schema.Types.ObjectId,ref:'Class'},
         roll_number:{type:String },
         total_presents:{type:Number,default:0},
