@@ -10,7 +10,7 @@ const announcementRouter=require('./routes/announcementRouter')
 const principalUserRouter=require('./routes/principalUserRouter')
 const principalDashboardRouter=require('./routes/principalDashboardRouter')
 const attendanceRouter=require('./routes/attendanceRouter')
-connectDB
+connectDB()
 
 app.use(cors({
   origin: function(origin, callback) {
