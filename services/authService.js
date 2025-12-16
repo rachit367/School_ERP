@@ -1,6 +1,6 @@
 const userModel = require('./../models/userModel');
 const otpModel = require('./../models/otpModel');
-const { generateOtp, hashOtp } = require('./../utils');
+const { generateOtp, hashOtp } = require('./../utils/otpUtil');
 const jwt = require('jsonwebtoken');
 const { generateAccessToken, generateRefreshToken } = require('../utils/tokenUtil');
 const { capitalizeEveryWord, normalizePhone } = require('../utils/loginUtils');

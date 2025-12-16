@@ -1,6 +1,6 @@
 require("dotenv").config()
 const cors=require('cors')
-const connectDB=require('./config/db')
+const {connectDB}=require('./config/db')
 const express=require('express')
 const app=express()
 const errorHandling=require('./middlewares/errorHandling')
@@ -10,7 +10,7 @@ const announcementRouter=require('./routes/announcementRouter')
 const principalUserRouter=require('./routes/principalUserRouter')
 const principalDashboardRouter=require('./routes/principalDashboardRouter')
 
-connectDB()
+connectDB
 
 app.use(cors({
   origin: function(origin, callback) {
@@ -36,4 +36,4 @@ app.use('/api/principal/dashboard',principalDashboardRouter)
 app.use(errorHandling)
 
 
-module.exports=app
+module.exports={app}

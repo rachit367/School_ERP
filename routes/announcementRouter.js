@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const blockTeacherAndStudent=require('./../middlewares/blockTeacherAndStudent')
+const {blockTeacherAndStudent}=require('./../middlewares/blockTeacherAndStudent')
 const {
     getSchoolAnnouncements,
     getClassAnnouncements,
@@ -11,7 +11,7 @@ const {
     removeTeacher
 } = require('./../controllers/announcementController');
 
-const { authenticateToken } = require('./../middlewares/authMiddleware');
+const { authenticateToken } = require('./../middlewares/authenticateToken');
 
 // Protect ALL routes
 router.use(authenticateToken);
