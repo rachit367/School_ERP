@@ -73,8 +73,26 @@ async function handleGetTeacher(teacher_id) {
 
 //req:teacher_id //res:{success}
 async function handleDeleteTeacher(teacher_id) {
-    await userModel.deleteOne({_id:teacher_id})
-    return {success:true}
+    //Remove teacher from all classes
+    await classModel.updateMany(
+        {
+            $or: [
+                { class_teacher: teacher_id },
+                { teachers: teacher_id },
+                { allowed_attendance_teachers: teacher_id }
+            ]
+        },
+        {
+            $set: { class_teacher: null },
+            $pull: {
+                teachers: teacher_id,
+                allowed_attendance_teachers: teacher_id
+            }
+        }
+    );
+    await userModel.deleteOne({ _id: teacher_id, role: 'Teacher' });
+
+    return { success: true };
 }
 
 //req:name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects  //res:{success,message}

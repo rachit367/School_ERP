@@ -9,7 +9,7 @@ const authRouter=require('./routes/authRouter')
 const announcementRouter=require('./routes/announcementRouter')
 const principalUserRouter=require('./routes/principalUserRouter')
 const principalDashboardRouter=require('./routes/principalDashboardRouter')
-
+const attendanceRouter=require('./routes/attendanceRouter')
 connectDB
 
 app.use(cors({
@@ -32,6 +32,7 @@ app.use('/api/auth',authRouter)
 app.use('/api/announcement',announcementRouter)
 app.use('/api/principal',principalUserRouter)
 app.use('/api/principal/dashboard',principalDashboardRouter)
+app.use('/api/attendance',attendanceRouter)
 
 app.use(errorHandling)
 
