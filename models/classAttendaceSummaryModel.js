@@ -22,6 +22,7 @@ const classAttendanceSummarySchema = new mongoose.Schema({
   date: {
     type: Date,
     required: true,
+    default: () => new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD
     index: true
   },
 

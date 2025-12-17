@@ -17,7 +17,7 @@ async function verifyOtp(req,res,next) {
         const phone=req.body.phone
         const result=await verifyOtpService(otp,phone)
         if (!result.success) {
-            return res.status(401).json(result);
+            return res.status(400).json(result);
         }
 return res.json(result);
     }catch(err){
@@ -58,7 +58,7 @@ async function refreshToken(req,res,next){
 async function getUserDetails(req,res,next){
     try{
         const user=await handleGetUserDetails(req.user_id)
-        return res.json(200).json(user)
+        return res.status(200).json(user)
     }catch(err){
         next(err)
     }
