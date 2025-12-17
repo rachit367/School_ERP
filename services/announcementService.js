@@ -46,7 +46,11 @@ async function handleCreateAnnouncement(topic,school,classes,description,user_id
             success:true
         }
     }
-    const Classes=await Promise.all(classes.map(c=>getClassId(c,user.school_id)));
+    const Classes=await classModel.find({
+        school_id:user.school_id,
+        class_name:{$in:classes}
+    })
+    
     const announcement=await announcementModel.create({
         school_id:user.school_id,
         title:topic,
@@ -56,6 +60,7 @@ async function handleCreateAnnouncement(topic,school,classes,description,user_id
         })
     return{
         success:true
+
     }
 }
 

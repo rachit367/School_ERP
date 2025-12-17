@@ -55,7 +55,7 @@ async function createTeacher(req,res,next){
 //req:teacher_id //res:{success}
 async function deleteTeacher(req,res,next) {
     try{
-        const response=await handleDeleteTeacher(req.params.id)
+        const response=await handleDeleteTeacher(req.params.id,req.school_id)
         return res.json(response)
     }catch(err){
         next(err)

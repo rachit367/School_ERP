@@ -49,7 +49,9 @@ async function handlesaveDailyAttendance(user_id, class_id, attendance) {
             .findById(class_id)
             .select('section school_id')
             .session(session);
-
+        if (attendance.length !== classDoc.students.length) {
+            throw new Error("Attendance count mismatch");
+        }
         const { section, school_id } = classDoc;
         const total_students = attendance.length;
 

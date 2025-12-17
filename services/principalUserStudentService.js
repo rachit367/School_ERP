@@ -2,11 +2,12 @@ const userModel=require('./../models/userModel');
 const classModel=require('./../models/classModel');
 const {calculateAge}=require('./../utils/calculateAge');
 const {formatDOB}=require('./../utils/formatDOB')
-
+const schoolModel=require('./../models/schoolModel')
 //req:school_id  //res:class_name,total_students,total_sections
 async function handleGetClasses(school_id){
     const classes=await classModel.find({school_id:school_id})
     .select('class_name section students')
+    .lean();
     const payload={}
     for (const {class_name,students} of classes){
         if(!payload[class_name]){
@@ -43,6 +44,7 @@ async function handleGetStudentsInSection(class_id){
     const students=await classModel.findById(class_id)
     .populate({path:'students', match:{ role:'Student' },select:'name studentProfile.roll_number _id'})
     .select('students');
+    if (!students) return [];
     const payload=students.students.map(s=>({
         _id:s._id,
         name:s.name,
@@ -93,7 +95,9 @@ async function handleAddStudent(school_id,name,class_name,section,dob,roll_numbe
         class_name,
         section,
     });
-
+    await schoolModel.findByIdAndUpdate(school_id,{
+        $inc:{total_students:1}
+    })
     // build studentProfile dynamically
     const studentProfile = {
         class_id: classDoc._id,
@@ -156,12 +160,16 @@ async function handleAddStudent(school_id,name,class_name,section,dob,roll_numbe
 
 //req:student_id  //res:success
 async function handleDeleteStudent(student_id){
-    await userModel.deleteOne({
-        _id: student_id,
-        role: 'Student'
-    });
+    const user = await userModel.findOne({ _id: student_id, role: 'Student' });
+    if (!user) throw new Error("Student not found");
 
+    await schoolModel.findByIdAndUpdate(user.school_id,{
+        $inc:{total_students:-1}
+    })
+
+    await userModel.deleteOne({ _id: student_id });
     //  Remove student from class.students array
+
     await classModel.updateOne(
         { students: student_id },
         { $pull: { students: student_id } }

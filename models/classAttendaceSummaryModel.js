@@ -22,8 +22,12 @@ const classAttendanceSummarySchema = new mongoose.Schema({
   date: {
     type: Date,
     required: true,
-    default: () => new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD
-    index: true
+    index: true,
+    default: () => {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      return d;             // YYYY-MM-DD
+    }
   },
 
   total_students: {

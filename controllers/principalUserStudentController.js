@@ -12,7 +12,7 @@ const {
 // res: [{ class_name, total_students, total_sections }]
 async function getClasses(req, res, next) {
     try {
-        const  school_id  = req.body.school_id;
+        const  school_id  = req.school_id;
 
         const data = await handleGetClasses(school_id);
 
@@ -29,7 +29,7 @@ async function getClasses(req, res, next) {
 // res: [{ section, class_teacher, total_students, _id }]
 async function getSections(req, res, next) {
     try {
-        const school_id=req.body.school_id
+        const school_id=req.school_id
         const {  class_name } = req.params;
 
         const data = await handleGetSections(class_name, school_id);

@@ -10,7 +10,7 @@ const {
 //req:school_id // res: [{ _id, class_name, section, substitute_teacher: [{ teacher_id, name }] }]
 async function getAllowedClasses(req, res, next) {
     try {
-        const school_id=req.query.school_id;
+        const school_id=req.school_id;
         if (!school_id) {
             throw new Error("school_id is required");
         }
@@ -51,7 +51,8 @@ async function saveDailyAttendance(req, res, next) {
 //req:school_id,substitute_id   //res:success,message
 async function assignSubstituteTeacher(req, res, next) {
     try {
-        const {substitute_id,school_id}=req.body
+        const substitute_id=req.body.substitute_id
+        const school_id=req.school_id
         const user_id=req.user_id
         const result=await handleAssignSubstituteTeacher(user_id,substitute_id,school_id) 
         return res.status(200).json(result)
@@ -62,7 +63,8 @@ async function assignSubstituteTeacher(req, res, next) {
 //req:school_id,substitute_id   //res:success,message
 async function removeSubstituteTeacher(req, res, next) {
     try {
-        const {substitute_id,school_id}=req.body
+        const substitute_id=req.body.substitute_id
+        const school_id=req.school_id
         const user_id=req.user_id
         const result=await handleRemoveSubstituteTeacher(user_id,substitute_id,school_id) 
         return res.status(200).json(result)

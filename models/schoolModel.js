@@ -15,11 +15,13 @@ const schoolSchema=new mongoose.Schema({
     },
     total_students:{
         type:Number,
-        min:0
+        min:0,
+        default:0
     },
     total_teachers:{
         type:Number,
-        min:0
+        min:0,
+        default:0
     }
 },{timestamps:true})
 

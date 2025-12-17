@@ -8,7 +8,16 @@ async function handleGetAllTeachers(user_id) {
     const teachers=await userModel.find({
         school_id:user.school_id,
         role:'Teacher'})
-        .populate({path:'teacherProfile.classes_assigned',select:'class_name section'})
+        .populate([
+        {
+            path:'teacherProfile.class_teacher_of',
+            select:'section class_name'
+        },
+        {
+            path:'teacherProfile.classes_assigned',
+            select:'section class_name'
+        }
+    ])
         .select(`
             _id
             name
@@ -16,6 +25,7 @@ async function handleGetAllTeachers(user_id) {
             teacherProfile.designation
             teacherProfile.subjects
             teacherProfile.classes_assigned
+            teacherProfile.class_teacher_of
         `)
     return teachers.map(t=>({
         _id:t._id,
@@ -23,6 +33,9 @@ async function handleGetAllTeachers(user_id) {
         role:t.role,
         designation:t.teacherProfile?.designation ?? '',
         subjects:t.teacherProfile?.subjects ?? [],
+        class_teacher_of:t.teacherProfile?.class_teacher_of
+        ? `${t.teacherProfile.class_teacher_of.class_name}-${t.teacherProfile.class_teacher_of.section}`
+        : '',
         classes_assigned: (t.teacherProfile?.classes_assigned || []).map(c => `${c.class_name}-${c.section}`)
     }))
 
@@ -72,7 +85,7 @@ async function handleGetTeacher(teacher_id) {
 }
 
 //req:teacher_id //res:{success}
-async function handleDeleteTeacher(teacher_id) {
+async function handleDeleteTeacher(teacher_id,school_id) {
     //Remove teacher from all classes
     await classModel.updateMany(
         {
@@ -91,7 +104,10 @@ async function handleDeleteTeacher(teacher_id) {
         }
     );
     await userModel.deleteOne({ _id: teacher_id, role: 'Teacher' });
-
+    await schoolModel.findByIdAndUpdate(
+        school_id,
+        { $inc: { total_teachers: -1 } }
+    );
     return { success: true };
 }
 
@@ -125,6 +141,10 @@ async function handleCreateTeacher(user_id,name,email,role,employee_id,class_tea
             subjects:subjects
         }
     });
+    await schoolModel.findByIdAndUpdate(
+    user.school_id,
+    { $inc: { total_teachers: 1 } }
+    );
     if (classTeacherOfId!==null){
         await classModel.findByIdAndUpdate(classTeacherOfId,{class_teacher:teacher._id})
     }

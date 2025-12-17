@@ -16,6 +16,7 @@ async function authenticateToken(req,res,next){
         }
         const decoded=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
         req.user_id=decoded.user_id
+        req.school_id=decoded.school_id
         next()
     }catch(err){
         if (err.name === "TokenExpiredError") {
