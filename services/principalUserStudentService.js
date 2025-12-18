@@ -169,7 +169,7 @@ async function handleDeleteStudent(student_id){
 
     await userModel.deleteOne({ _id: student_id });
     //  Remove student from class.students array
-
+    await attendanceModel.deleteMany({ student_id });
     await classModel.updateOne(
         { students: student_id },
         { $pull: { students: student_id } }

@@ -2,12 +2,11 @@ const userModel = require('../models/userModel');
 
 async function blockTeacherAndStudent(req, res, next) {
   try {
-    const user = await userModel.findById(req.user_id).select('role');
-
+    const role=req.role
     if (
       !user ||
-      user.role === 'Teacher' ||
-      user.role === 'Student'
+      role === 'Teacher' ||
+      role === 'Student'
     ) {
       return res.status(403).json({
         success: false,

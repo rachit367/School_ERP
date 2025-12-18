@@ -15,6 +15,7 @@ async function handleGetSchoolAnnouncements(user_id){
 //req:  //res:[title,message,createdAt,_id]
 async function handleGetClassAnnouncements(user_id){
     const user=await userModel.findById(user_id)
+    if (!user.studentProfile?.class_id) return [];
     const announcements=await announcementModel.find({school_id: user.school_id,
         $or: [
             { class_id: user.studentProfile.class_id }, // class announcements

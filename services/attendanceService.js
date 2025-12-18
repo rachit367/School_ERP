@@ -3,7 +3,7 @@ const attendanceModel=require('./../models/attendanceModel')
 const classAttendanceModel=require('./../models/classAttendaceSummaryModel')
 const classModel=require('./../models/classModel')
 const {canMarkAttendance}=require('../utils/canMarkAttendance')
-const {getClassId}=require('./../utils/classIdUtil')
+const mongoose = require('mongoose');
 
 //req:school_id // res: [{ _id, class_name, section, substitute_teacher: [{ teacher_id, name }] }]
 async function handleGetAllowedClasses(user_id,school_id) {
@@ -27,8 +27,6 @@ async function handleGetAllowedClasses(user_id,school_id) {
 }
 
 //req:class_id,attendance  //res:success,message
-const mongoose = require('mongoose');
-
 async function handlesaveDailyAttendance(user_id, class_id, attendance) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -47,7 +45,7 @@ async function handlesaveDailyAttendance(user_id, class_id, attendance) {
         // Fetch class
         const classDoc = await classModel
             .findById(class_id)
-            .select('section school_id')
+            .select('section school_id students')
             .session(session);
         if (attendance.length !== classDoc.students.length) {
             throw new Error("Attendance count mismatch");
