@@ -10,6 +10,7 @@ const announcementRouter=require('./routes/announcementRouter')
 const principalUserRouter=require('./routes/principalUserRouter')
 const principalDashboardRouter=require('./routes/principalDashboardRouter')
 const attendanceRouter=require('./routes/attendanceRouter')
+const homeworkRouter=require('./routes/homeworkRouter')
 connectDB()
 
 app.use(cors({
@@ -30,9 +31,14 @@ app.use(express.urlencoded({extended:true}));
 
 app.use('/api/auth',authRouter)
 app.use('/api/announcement',announcementRouter)
+
 app.use('/api/principal',principalUserRouter)
 app.use('/api/principal/dashboard',principalDashboardRouter)
+
 app.use('/api/attendance',attendanceRouter)
+app.use('/api/homework',homeworkRouter)
+
+
 
 app.use(errorHandling)
 
