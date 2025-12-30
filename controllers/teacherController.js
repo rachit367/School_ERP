@@ -11,3 +11,7 @@ async function getTeacherClasses(req,res,next){
         next(err)
     }
 }
+
+module.exports={
+    getTeacherClasses
+}

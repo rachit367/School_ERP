@@ -1,7 +1,8 @@
 const {
     handleGetAllHomeworks,
     handleGetHomeworkDetails,
-    handlePostHomework
+    handlePostHomework,
+    handleGetClassHomework
 }=require('./../services/homeworkService')
 
 // req:  // res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
@@ -43,8 +44,21 @@ async function postHomework(req,res,next){
     }
 }
 
+//req:classId //res:res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
+async function getClassHomework(req,res,next) {
+    try{
+        const class_id=req.params.classId
+        const user_id=req.user_id
+        const result=await handleGetClassHomework(class_id,user_id)
+        return res.status(200).json(result)
+    }catch(err){
+        next(err)
+    }
+}
+
 module.exports={
     getAllHomeworks,
     getHomeworkDetails,
-    postHomework
+    postHomework,
+    getClassHomework
 }
