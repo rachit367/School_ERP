@@ -6,7 +6,7 @@ const {
     handleAddStudent,
     handleDeleteStudent,
     handleTransferStudent
-} = require('../services/principalUserStudentService');
+} = require('../services/userStudentService');
 
 // req: school_id
 // res: [{ class_name, total_students, total_sections }]

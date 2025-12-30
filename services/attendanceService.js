@@ -223,20 +223,47 @@ async function handleGetClassAttendance(user_id,class_id){
 
 //req:school_id,substitute_id   //res:success,message
 async function handleAssignSubstituteTeacher(user_id,substitute_id,school_id) {
+    const classDoc=await classModel.findOne({ class_teacher: user_id, school_id });
     await classModel.updateOne(
-    { class_teacher: user_id, school_id },
-    { $addToSet: { allowed_attendance_teachers: substitute_id } }
-);
+        { _id: classDoc._id },
+        { $addToSet: { allowed_attendance_teachers: substitute_id } }
+    );
+    await userModel.updateOne(
+        { _id: substitute_id },
+        { $addToSet: { "teacherProfile.classes_assigned": classDoc._id } }
+    );
     return {success:true,message:'Substitute Teacher Added'}
 }
 
 //req:school_id,substitute_id   //res:success,message
 async function handleRemoveSubstituteTeacher(user_id,substitute_id,school_id){
+    const classDoc = await classModel.findOne({
+        class_teacher: user_id,
+        school_id: school_id
+    }).select('_id');
+
+    if (!classDoc) {
+        throw new Error("Class not found or user not authorized");
+    }
+
     await classModel.updateOne(
-    { class_teacher: user_id, school_id },
-    { $pull: { allowed_attendance_teachers: substitute_id } }
-);
-    return {success:true,message:'Substitute Teacher Removed'}
+        { _id: classDoc._id },
+        { $pull: { allowed_attendance_teachers: substitute_id } }
+    );
+
+    await userModel.updateOne(
+        { _id: substitute_id },
+        {
+            $pull: {
+                "teacherProfile.classes_assigned": classDoc._id
+            }
+        }
+    );
+
+    return {
+        success: true,
+        message: "Substitute Teacher Removed"
+    };
 } 
 
 //req:from_date,to_date,student_id  //res:{name,roll_number,{date:status},attendance_percentage,present,absent}

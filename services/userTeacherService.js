@@ -1,6 +1,6 @@
 const userModel=require('../models/userModel')
-const getClassId=require('./../utils/classIdUtil')
-const classModel=require('./../models/classModel')
+const getClassId=require('../utils/classIdUtil')
+const classModel=require('../models/classModel')
 
 //req:  //res: [{ _id, name, role, designation, subjects, classes_assigned }]
 async function handleGetAllTeachers(user_id) {

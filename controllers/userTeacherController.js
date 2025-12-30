@@ -1,5 +1,5 @@
 
-const { handleGetAllTeachers,handleGetTeacher,handleCreateTeacher,handleDeleteTeacher,handleUpdateTeacher} = require('./../services/principalUserTeacherService')
+const { handleGetAllTeachers,handleGetTeacher,handleCreateTeacher,handleDeleteTeacher,handleUpdateTeacher} = require('../services/userTeacherService')
 
 //req:  //res: [{ _id, name, role, designation, subjects, classes_assigned }]
 async function getAllTeachers(req,res,next) {

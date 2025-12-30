@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('./../middlewares/authenticateToken');
-const {getAllTeachers,getTeacher,deleteTeacher,createTeacher,updateTeacher}=require('../controllers/principalUserTeacherController');
+const { authenticateToken } = require('../middlewares/authenticateToken');
+const {getAllTeachers,getTeacher,deleteTeacher,createTeacher,updateTeacher}=require('../controllers/userTeacherController');
 const {
     getClasses,
     getSections,
@@ -10,7 +10,7 @@ const {
     addStudent,
     deleteStudent,
     transferStudent
-} = require('../controllers/principalUserStudentController');
+} = require('../controllers/userStudentController');
 
 router.use(authenticateToken);
 

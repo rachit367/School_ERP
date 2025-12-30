@@ -5,7 +5,6 @@ const classSchema = new mongoose.Schema({
     class_name:{type:Number,required:true},  //always integer 1,2,3 not roman
     section:{type:String,set: v => v.replace(/\b\w/g, c => c.toUpperCase())},
     class_teacher:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
-    teachers:[{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
     students:[{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
     allowed_attendance_teachers:[{type:mongoose.Schema.Types.ObjectId,ref:'User',index:true}],
     timetable: {type:{ name:String,url:String }},   // PDF / doc / link
