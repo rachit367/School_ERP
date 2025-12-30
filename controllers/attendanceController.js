@@ -1,22 +1,23 @@
 const userModel = require('../models/userModel');
 const {
-    handleGetAllowedClasses,
+    handleCheckAllowedClass,
     handlesaveDailyAttendance,
     handleAssignSubstituteTeacher,
     handleRemoveSubstituteTeacher,
     handleGetStudentAttendance,
     handleGetClassAttendance}=require('./../services/attendanceService')
 
-//req:school_id // res: [{ _id, class_name, section, substitute_teacher: [{ teacher_id, name }] }]
-async function getAllowedClasses(req, res, next) {
+//req:class_id // res: allowed(true or false)
+async function checkAllowedClass(req, res, next) {
     try {
         const school_id=req.school_id;
         if (!school_id) {
             throw new Error("school_id is required");
         }
         const user_id=req.user_id
-        const result =await handleGetAllowedClasses(user_id,school_id)
-        return res.status(200).json(result)
+        const class_id=req.params.id
+        const allowed =await handleCheckAllowedClass(user_id,class_id,school_id)
+        return res.status(200).json({allowed})
     } catch (err) {
         next(err);
     }
@@ -46,7 +47,6 @@ async function saveDailyAttendance(req, res, next) {
         next(err);
     }
 }
-
 
 //req:school_id,substitute_id   //res:success,message
 async function assignSubstituteTeacher(req, res, next) {
@@ -86,7 +86,7 @@ async function getStudentAttendance(req, res, next) {
 }
 
 module.exports = {
-    getAllowedClasses,
+    checkAllowedClass,
     getClassAttendance,
     saveDailyAttendance,
     assignSubstituteTeacher,

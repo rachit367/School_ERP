@@ -1,7 +1,7 @@
 const express=require('express')
 const router=express.Router()
 const {
-    getAllowedClasses,
+    checkAllowedClass,
     getClassAttendance,
     saveDailyAttendance,
     assignSubstituteTeacher,
@@ -16,8 +16,8 @@ router.use(authenticateToken);
 //req:from_date,to_date,student_id  //res:{name,roll_number,{date:status},attendance_percentage,present,absent}
 router.get('/student/:id',getStudentAttendance)     //date in YYYY-MM-DD
 
-//req:school_id // res: [{ _id, class_name, section, substitute_teacher: [{ teacher_id, name }] }]
-router.get('/allowed-classes',getAllowedClasses)
+//req:class_id // res: allowed(true or false)
+router.get('/allowed-class/:id',checkAllowedClass)
 
 //req:class_name  //res:{payload-{student_id,name,roll_number,attendance_percent,todays_status}}
 router.get('/class/:classid',getClassAttendance)

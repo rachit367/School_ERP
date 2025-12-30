@@ -5,25 +5,17 @@ const classModel=require('./../models/classModel')
 const {canMarkAttendance}=require('../utils/canMarkAttendance')
 const mongoose = require('mongoose');
 
-//req:school_id // res: [{ _id, class_name, section, substitute_teacher: [{ teacher_id, name }] }]
-async function handleGetAllowedClasses(user_id,school_id) {
-    const classes=await classModel.find({
+//req:class_id // res: allowed(true or false)
+async function handleCheckAllowedClass(user_id,class_id,school_id) {
+    const exists=await classModel.exists({
+        _id:class_id,
         school_id:school_id,
-        $or:[{class_teacher:user_id},{allowed_attendance_teachers:user_id}]
-    })
-    .select('section class_name _id allowed_attendance_teachers')
-    .populate('allowed_attendance_teachers','name _id')
-    .lean();
-    const result=classes.map(c=>({
-        _id:c._id,
-        class_name:c.class_name,
-        section:c.section,
-        substitute_teachers:(c.allowed_attendance_teachers || []).map(t=>({
-            teacher_id:t._id,
-            name:t.name
-        }))
-    }))
-    return result
+        $or:[
+            {class_teacher:user_id},
+            {allowed_attendance_teachers:user_id}
+        ]
+    });
+    return !!exists
 }
 
 //req:class_id,attendance  //res:success,message
@@ -287,7 +279,7 @@ async function handleGetStudentAttendance(from_date,to_date,student_id){  //date
 }
 
 module.exports={
-    handleGetAllowedClasses,
+    handleCheckAllowedClass,
     handleGetClassAttendance,
     handlesaveDailyAttendance,
     handleAssignSubstituteTeacher,
