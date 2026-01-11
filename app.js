@@ -39,7 +39,7 @@ app.use('/api/principal/dashboard',principalDashboardRouter)
 app.use('/api/attendance',attendanceRouter)
 app.use('/api/homework',homeworkRouter)
 
-app.use('/api/teacher')
+//app.use('/api/teacher')
 
 app.use(errorHandling)
 

@@ -112,7 +112,7 @@ async function handleDeleteTeacher(teacher_id,school_id) {
 }
 
 //req:name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects  //res:{success,message}
-async function handleCreateTeacher(user_id,name,email,role,employee_id,class_teacher_of,classes_assigned,subjects){
+async function handleCreateTeacher(user_id,name,email,phone,role,employee_id,class_teacher_of,classes_assigned,subjects){
     const user=await userModel.findById(user_id)
     .select('school_id');
     const designation = class_teacher_of ? 'Mentor' : 'ST';
@@ -131,6 +131,7 @@ async function handleCreateTeacher(user_id,name,email,role,employee_id,class_tea
     const teacher=await userModel.create({
         name:name,
         email:email,
+        phone:phone,
         role:role,
         school_id:user.school_id,
         teacherProfile:{
