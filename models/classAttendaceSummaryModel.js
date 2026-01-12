@@ -57,4 +57,4 @@ const classAttendanceSummarySchema = new mongoose.Schema({
 }, {timestamps: true});
 
 
-module.exports = mongoose.model('ClassAttendanceSummary',classAttendanceSummarySchema);
+module.exports = mongoose.model('Classattendancesummary',classAttendanceSummarySchema);

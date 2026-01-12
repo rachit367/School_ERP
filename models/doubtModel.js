@@ -36,4 +36,4 @@ const doubtSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
-module.exports = mongoose.model('doubt', doubtSchema)
+module.exports = mongoose.model('Doubt', doubtSchema)
