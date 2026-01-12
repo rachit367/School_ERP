@@ -3,14 +3,17 @@ const cors=require('cors')
 const {connectDB}=require('./config/db')
 const express=require('express')
 const app=express()
-const errorHandling=require('./middlewares/errorHandling')
+
 const allowedOrigins=process.env.ALLOWED_ORIGINS.split(',')
+
+const errorHandling=require('./middlewares/errorHandling')
 const authRouter=require('./routes/authRouter')
 const announcementRouter=require('./routes/announcementRouter')
 const principalUserRouter=require('./routes/principalUserRouter')
 const principalDashboardRouter=require('./routes/principalDashboardRouter')
 const attendanceRouter=require('./routes/attendanceRouter')
 const homeworkRouter=require('./routes/homeworkRouter')
+const teacherRouter=require('./routes/teacherRouter')
 
 connectDB()
 
@@ -39,7 +42,7 @@ app.use('/api/principal/dashboard',principalDashboardRouter)
 app.use('/api/attendance',attendanceRouter)
 app.use('/api/homework',homeworkRouter)
 
-//app.use('/api/teacher')
+app.use('/api/teacher',teacherRouter)
 
 app.use(errorHandling)
 

@@ -1,5 +1,8 @@
-const classModel=require('./../models/classModel')
+const doubtModel=require('./../models/doubtModel')
 const userModel=require('./../models/userModel')
+
+
+//req: user_id  //res:[{id,class_name,section,total_students,class_teacher_name}]
 
 async function handleGetTeacherClasses(user_id) {
     const user = await userModel.findById(user_id)
@@ -40,8 +43,28 @@ async function handleGetTeacherClasses(user_id) {
     return result;
 }
 
+//req:user_id
+async function handleGetDoubts(user_id){
+    const doubts=await doubtModel.find({teacher:user_id})
+    .select('_id student_name class_name doubt status createdAt')
+    .lean()
+    return doubts
+}
+
+async function handleUpdateDoubt(user_id,doubt_id,reply) { //send empty reply to mark doubt as resolved
+    const doubt=await doubtModel.findOneAndUpdate({
+        _id:doubt_id
+    },{
+        'reply.text':reply,
+        'reply.replied_at':new Date(),
+        status:'Resolved'
+    })
+    return {success:true}
+}
 
 
 module.exports={
-    handleGetTeacherClasses
+    handleGetTeacherClasses,
+    handleGetDoubts,
+    handleUpdateDoubt
 }
