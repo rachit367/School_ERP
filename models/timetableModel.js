@@ -1,6 +1,11 @@
 const mongoose = require('mongoose')
 
 const timetableSchema = new mongoose.Schema({
+    school_id:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'School',
+        required:true
+    },
     class_id:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Class',
@@ -19,7 +24,7 @@ const timetableSchema = new mongoose.Schema({
     }]
 },{timestamps:true})
 
-timetableSchema.index({ class_id: 1, day: 1 })
-timetableSchema.index({ "periods.teacher_id": 1 })
+timetableSchema.index({ school_id:1,class_id: 1, day: 1 })
+timetableSchema.index({ school_id:1,"periods.teacher_id": 1 })
 
 module.exports = mongoose.model('Timetable', timetableSchema)
