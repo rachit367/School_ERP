@@ -1,5 +1,3 @@
-const mongoose=require('mongoose')
-
 const mongoose = require('mongoose')
 
 const timetableSchema = new mongoose.Schema({
@@ -19,6 +17,9 @@ const timetableSchema = new mongoose.Schema({
             ref:'User'
         }
     }]
-})
+},{timestamps:true})
+
+timetableSchema.index({ class_id: 1, day: 1 })
+timetableSchema.index({ "periods.teacher_id": 1 })
 
 module.exports = mongoose.model('Timetable', timetableSchema)
