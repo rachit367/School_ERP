@@ -25,5 +25,4 @@ attendanceSchema.index(
 attendanceSchema.index({ class_id: 1, date: 1 });
 attendanceSchema.index({ student_id: 1, date: 1 });
 
-
 module.exports = mongoose.model("Attendance", attendanceSchema);

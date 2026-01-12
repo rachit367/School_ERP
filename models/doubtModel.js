@@ -36,4 +36,7 @@ const doubtSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
+doubtSchema.index({school_id:1,teacher:1})
+doubtSchema.index({school_id:1,student:1})
+
 module.exports = mongoose.model('Doubt', doubtSchema)

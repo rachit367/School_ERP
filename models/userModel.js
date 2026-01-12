@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     school_id:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'School',
-        require:true
+        required:true
     },
     date_of_birth:{
         type:Date
@@ -60,5 +60,7 @@ const userSchema = new mongoose.Schema({
         announcement_allowed:{type:Boolean,default:false},
     }
 },{timestamps:true})
+
+userSchema.index({school_id:1,role:1})
 
 module.exports = mongoose.model('User', userSchema)

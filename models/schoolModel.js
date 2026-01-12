@@ -11,7 +11,7 @@ const schoolSchema=new mongoose.Schema({
     principal_id:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
-        required:true
+        default:null
     },
     total_students:{
         type:Number,
@@ -24,5 +24,7 @@ const schoolSchema=new mongoose.Schema({
         default:0
     }
 },{timestamps:true})
+
+
 
 module.exports=mongoose.model('School',schoolSchema)

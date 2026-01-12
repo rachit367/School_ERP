@@ -32,4 +32,6 @@ const examSchema = new mongoose.Schema({
 
 },{timestamps:true})
 
+examSchema.index({school_id:1,class_id:1})
+
 module.exports = mongoose.model('Exam', examSchema)

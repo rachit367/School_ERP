@@ -15,4 +15,6 @@ const ptmSchema = new mongoose.Schema({
 
 },{timestamps:true})
 
+
+
 module.exports = mongoose.model('Ptm', ptmSchema)

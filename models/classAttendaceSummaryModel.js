@@ -56,5 +56,5 @@ const classAttendanceSummarySchema = new mongoose.Schema({
   }
 }, {timestamps: true});
 
-
+classAttendanceSummarySchema.index({school_id:1,class_id:1,date:1})
 module.exports = mongoose.model('Classattendancesummary',classAttendanceSummarySchema);

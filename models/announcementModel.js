@@ -29,4 +29,6 @@ const announcementSchema = new mongoose.Schema({
     }]
 },{timestamps:true})
 
+announcementSchema.index({school_id:1})
+
 module.exports = mongoose.model('Announcement', announcementSchema)
