@@ -51,7 +51,8 @@ async function handleGetDoubts(user_id){
     return doubts
 }
 
-async function handleUpdateDoubt(user_id,doubt_id,reply) { //send empty reply to mark doubt as resolved
+
+async function handleUpdateDoubt(doubt_id,reply) { //send empty reply to mark doubt as resolved
     const doubt=await doubtModel.findOneAndUpdate({
         _id:doubt_id
     },{

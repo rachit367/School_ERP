@@ -20,7 +20,7 @@ router.get('/assigned-classes',getTeacherClasses)
 
 //=====================DOUBT====================
 
-
+//req:user_id
 router.get('/doubt',getDoubts)
 
 //req:user_id,doubt_id //res:success
