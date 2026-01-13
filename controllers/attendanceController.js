@@ -24,7 +24,7 @@ async function checkAllowedClass(req, res, next) {
 }
 
 
-//req:class_name  //res:{payload-{student_id,name,roll_number,attendance_percent,todays_status}}
+//req:classid  //res:{payload-{student_id,name,roll_number,attendance_percent,todays_status}}
 async function getClassAttendance(req, res, next) {
     try {
         const user_id=req.user_id

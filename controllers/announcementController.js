@@ -14,10 +14,7 @@ async function getSchoolAnnouncements(req, res, next) {
 
         const announcements = await handleGetSchoolAnnouncements(user_id);
 
-        return res.status(200).json({
-            success: true,
-            data: announcements
-        });
+        return res.status(200).json(announcements);
 
     } catch (err) {
         next(err);
@@ -31,10 +28,7 @@ async function getClassAnnouncements(req, res, next) {
 
         const announcements = await handleGetClassAnnouncements(user_id);
 
-        return res.status(200).json({
-            success: true,
-            data: announcements
-        });
+        return res.status(200).json(announcements);
 
     } catch (err) {
         next(err);
@@ -69,10 +63,7 @@ async function getAnnouncementById(req, res, next) {
 
         const announcement = await handleGetAnnouncements(id);
 
-        return res.status(200).json({
-            success: true,
-            data: announcement
-        });
+        return res.status(200).json(announcement);
 
     } catch (err) {
         next(err);

@@ -65,6 +65,4 @@ router.delete('/users/students/:student_id', deleteStudent);
 router.patch('/users/students/:student_id/transfer', transferStudent);
 
 
-
-
 module.exports=router

@@ -21,9 +21,7 @@ const doubtSchema = new mongoose.Schema({
     doubt:{
         type:String,
     },
-    doubt_attachments:[{
-        url:String
-    }],
+    doubt_attachments:[String],
     reply:{
         text:String,
         attachments:[{type:String}],

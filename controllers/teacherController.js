@@ -19,7 +19,7 @@ async function getDoubts(req, res, next){
   try {
     const user_id=req.user_id
     const result=await handleGetDoubts(user_id)
-    res.status(200).json({result});
+    res.status(200).json(result);
 
   } catch (err) {
     next(err);

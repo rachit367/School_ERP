@@ -4,9 +4,9 @@ const { handleGetAllTeachers,handleGetTeacher,handleCreateTeacher,handleDeleteTe
 //req:  //res: [{ _id, name, role, designation, subjects, classes_assigned }]
 async function getAllTeachers(req,res,next) {
     try{
-        const user_id=req.user_id
-        const teachers=await handleGetAllTeachers(user_id)
-        return res.json(teachers)
+        const school_id=req.school_id
+        const teachers=await handleGetAllTeachers(school_id)   
+        return res.status(200).json(teachers)
     }catch(err){
         next(err)
     }
@@ -17,7 +17,7 @@ async function getTeacher(req,res,next) {
     try{
         const teacher_id=req.params.id
         const details=await handleGetTeacher(teacher_id)
-        return res.json(details)
+        return res.status(200).json(details)
     }catch(err){
         next(err)
     }
@@ -48,7 +48,7 @@ async function createTeacher(req,res,next){
             classes_assigned,
             subjects
         );
-        return res.json(response);
+        return res.status(200).json(response);
     }catch(err){
         next(err)
     }
@@ -58,7 +58,7 @@ async function createTeacher(req,res,next){
 async function deleteTeacher(req,res,next) {
     try{
         const response=await handleDeleteTeacher(req.params.id,req.school_id)
-        return res.json(response)
+        return res.status(200).json(response)
     }catch(err){
         next(err)
     }
@@ -67,7 +67,7 @@ async function deleteTeacher(req,res,next) {
 async function updateTeacher(req,res,next){
     try{    
         const response=await handleUpdateTeacher(req.params.id,req.body)
-        return res.json(response)
+        return res.status(200).json(response)
     }catch(err){
         next(err)
     }

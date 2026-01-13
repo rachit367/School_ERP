@@ -19,7 +19,7 @@ async function verifyOtp(req,res,next) {
         if (!result.success) {
             return res.status(400).json(result);
         }
-return res.json(result);
+return res.status(200).json(result);
     }catch(err){
         next(err)
     }

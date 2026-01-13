@@ -193,19 +193,26 @@ async function handlesaveDailyAttendance(user_id, class_id, attendance) {
     }
 }
 
-//req:class_name  //res:{payload-{student_id,name,roll_number,attendance_percent,todays_status}}
+//req:classid  //res:{payload-{student_id,name,roll_number,attendance_percent,todays_status}}
 async function handleGetClassAttendance(user_id,class_id){
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
     const classDoc=await classModel.findById(class_id)
     .populate({path:'students',select:'studentProfile.total_presents studentProfile.total_absents _id studentProfile.roll_number name'})
-    .select('students').lean()
+    .select('students')
+    .lean()
+
     const todays_attendance=await attendanceModel.find({class_id,date:today}).select('student_id status').lean()
     const todayMap={}
+
     for(const a of todays_attendance){
         todayMap[a.student_id.toString()]=a.status;
     }
+
     const studentsAttendance={}
+
     for(const s of classDoc.students){
         const p = s.studentProfile?.total_presents ?? 0;
         const a = s.studentProfile?.total_absents ?? 0;

@@ -11,20 +11,23 @@ const timetableSchema = new mongoose.Schema({
         ref:'Class',
         required:true
     },
-    day:String,
+    day:{  //first word always capital
+        type:String,
+        enum:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+    },
     periods:[{
         start:String,
         end:String,
         subject:String,
         location:String,
-        teacher_id:{
+        teacher:{
             type:mongoose.Schema.Types.ObjectId,
             ref:'User'
         }
     }]
 },{timestamps:true})
 
-timetableSchema.index({ school_id:1,class_id: 1, day: 1 })
-timetableSchema.index({ school_id:1,"periods.teacher_id": 1 })
+timetableSchema.index({ school_id:1,class_id: 1, day: 1 },{unique:true})
+timetableSchema.index({ school_id:1,"periods.teacher": 1 })
 
 module.exports = mongoose.model('Timetable', timetableSchema)

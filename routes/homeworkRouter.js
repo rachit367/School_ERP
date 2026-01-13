@@ -16,8 +16,8 @@ router.use(authenticateToken)
 // req:  // res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
 router.get('/',isTeacher,getAllHomeworks)
 
-//req:classId //res:res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
-router.get('/class/:classId',isTeacher,getClassHomework)
+//req:classid //res:res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
+router.get('/class/:classid',isTeacher,getClassHomework)
 
 // req: homework_id  // res: { id, topic, description, class_name, section, due_date, total_students, total_submission, submitted_by[] }
 router.get('/:id',isTeacher,getHomeworkDetails)

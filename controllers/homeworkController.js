@@ -8,7 +8,9 @@ const {
 // req:  // res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
 async function getAllHomeworks(req,res,next){
     try{
-        const result=await handleGetAllHomeworks()
+        const user_id=req.user_id
+        const school_id=req.school_id
+        const result=await handleGetAllHomeworks(user_id,school_id)
         res.status(200).json(result)
     }catch(err){
         next(err)
@@ -47,7 +49,7 @@ async function postHomework(req,res,next){
 //req:classId //res:res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
 async function getClassHomework(req,res,next) {
     try{
-        const class_id=req.params.classId
+        const class_id=req.params.classid
         const user_id=req.user_id
         const result=await handleGetClassHomework(class_id,user_id)
         return res.status(200).json(result)

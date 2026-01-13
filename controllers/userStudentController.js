@@ -13,7 +13,6 @@ const {
 async function getClasses(req, res, next) {
     try {
         const  school_id  = req.school_id;
-
         const data = await handleGetClasses(school_id);
 
         return res.status(200).json({
