@@ -15,10 +15,7 @@ async function getClasses(req, res, next) {
         const  school_id  = req.school_id;
         const data = await handleGetClasses(school_id);
 
-        return res.status(200).json({
-            success: true,
-            data
-        });
+        return res.status(200).json(data);
     } catch (err) {
         next(err);
     }
@@ -33,10 +30,7 @@ async function getSections(req, res, next) {
 
         const data = await handleGetSections(class_name, school_id);
 
-        return res.status(200).json({
-            success: true,
-            data
-        });
+        return res.status(200).json({data});
     } catch (err) {
         next(err);
     }
@@ -50,10 +44,7 @@ async function getStudentsInSection(req, res, next) {
 
         const data = await handleGetStudentsInSection(class_id);
 
-        return res.status(200).json({
-            success: true,
-            data
-        });
+        return res.status(200).json(data);
     } catch (err) {
         next(err);
     }
@@ -67,10 +58,7 @@ async function getStudentDetails(req, res, next) {
 
         const data = await handleGetStudentDetails(student_id);
 
-        return res.status(200).json({
-            success: true,
-            data
-        });
+        return res.status(200).json(data);
     } catch (err) {
         next(err);
     }

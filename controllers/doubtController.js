@@ -28,3 +28,8 @@ async function updateDoubt(req, res, next){
     next(err);
   }
 };
+
+module.exports={
+  updateDoubt,
+  getDoubts
+}

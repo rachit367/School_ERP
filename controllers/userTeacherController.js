@@ -23,7 +23,7 @@ async function getTeacher(req,res,next) {
     }
 }
 
-//req:name,email,phone,role,employee_id,class_teacher_of,designation,subjects  //res:{success,message}
+//req:name,email,phone,role,employee_id,class_teacher_of,subjects  //res:{success,message}
 async function createTeacher(req,res,next){
     try{
         const {

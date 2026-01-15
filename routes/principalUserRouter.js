@@ -23,7 +23,7 @@ router.get('/users/teachers/:id',getTeacher)
 //req:teacher_id  //res:{success}
 router.delete('/users/teachers/:id',deleteTeacher)
 
-//req:name,email,phone,role,employee_id,class_teacher_of,subjects,phone  //res:{success,message}
+//req:name,email,phone,role,employee_id,class_teacher_of,subjects  //res:{success,message}
 router.post('/users/teachers',createTeacher)    
 
 // req: teacher_id, { class_teacher_of, subjects }  // res: { success, message }

@@ -81,7 +81,7 @@ async function deletePeriod(req, res, next){
 // req: class_id
 async function studentTimetable(req, res, next){
   try{
-    const class_id  = req.body.id
+    const class_id  = req.params.id
     const school_id = req.school_id
 
     const data = await handleStudentTimetable(

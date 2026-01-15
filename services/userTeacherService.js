@@ -110,7 +110,7 @@ async function handleDeleteTeacher(teacher_id,school_id) {
     return { success: true };
 }
 
-//req:name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects  //res:{success,message}
+//req:name,email,role,employee_id,class_teacher_of,classes_assigned,subjects  //res:{success,message}
 async function handleCreateTeacher(name,email,phone,role,employee_id,class_teacher_of,subjects,school_id){
     const designation = class_teacher_of ? 'Mentor' : 'ST';
     let classTeacherOfId = null;
