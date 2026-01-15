@@ -62,7 +62,7 @@ async function MakeRequest(req,res,next) {
         const start_date=req.body.start_date
         const end_date=req.body.end_date ?? start_date
         const reason=req.body.reason ?? ''
-        data=await handleMakeRequest(school_id,student_id,class_id,reason,start_date,end_date)
+        const data=await handleMakeRequest(school_id,student_id,class_id,reason,start_date,end_date)
         return res.status(200).json(data)
     }catch(error){
         next(error)

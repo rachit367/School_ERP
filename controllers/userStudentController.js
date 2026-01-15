@@ -81,8 +81,8 @@ async function getStudentDetails(req, res, next) {
 // res: success
 async function addStudent(req, res, next) {
     try {
+        const school_id=req.school_id
         const {
-            school_id,
             name,
             class_name,
             section,

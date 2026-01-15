@@ -19,7 +19,7 @@ async function getDoubts(req, res, next){
 async function updateDoubt(req, res, next){
   try {
     //send empty reply to mark doubt as resolved
-    const reply=req.reply ?? ''
+    const reply=req.body.reply ?? ''
     const doubt_id=req.params.id
     const result=await handleUpdateDoubt(doubt_id,reply)
     res.status(200).json({result});

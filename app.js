@@ -46,7 +46,7 @@ app.use('/api/principal/dashboard',principalRouter)
 app.use('/api/announcement',announcementRouter)
 app.use('/api/attendance',attendanceRouter)
 app.use('/api/homework',homeworkRouter)
-app.use('/api/timtable',timetableRouter)
+app.use('/api/timetable',timetableRouter)
 app.use('/api/leave',leaveRouter)
 app.use('/api/doubt',doubtRouter)
 
