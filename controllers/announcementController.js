@@ -7,7 +7,8 @@ const {
     handleAssignTeacher,
     handleRemoveTeacher
 } = require("./../services/announcementService");
-//req:   //res: [_id, message, title, createdAt, _id]
+
+//req:   //res: [{_id, message, title, createdAt}]
 async function getSchoolAnnouncements(req, res, next) {
     try {
         const user_id = req.user_id;

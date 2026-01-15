@@ -14,7 +14,7 @@ const leaveSchema = new mongoose.Schema({
     status:{
         type:String,
         enum:['Approved','Rejected','Pending'],
-        default:'pending'
+        default:'Pending'
     },
     reason:{
         type:String
@@ -40,6 +40,6 @@ const leaveSchema = new mongoose.Schema({
 
 },{timestamps:true})
 
-leaveSchema.index({school_id:1,student_id:1})
+leaveSchema.index({school_id:1,student:1})
 
 module.exports = mongoose.model('Leave', leaveSchema)

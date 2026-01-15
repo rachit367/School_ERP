@@ -18,7 +18,7 @@ async function handleCheckAllowedClass(user_id,class_id,school_id) {
     return !!exists
 }
 
-//req:class_id,attendance  //res:success,message
+//req:{class_id,attendance:[student_id,status]}  //res:success,message     status:P,A only
 async function handlesaveDailyAttendance(user_id, class_id, attendance) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -194,7 +194,7 @@ async function handlesaveDailyAttendance(user_id, class_id, attendance) {
 }
 
 // req: class_id  // res: {class_attendance_percentage,total_present,total_absent,students:[{student_id,name,roll_number,attendance_percentage,today_attendance}]}
-async function handleGetClassAttendance(class_id){
+async function handleGetClassAttendance(class_id,school_id){
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -220,8 +220,8 @@ async function handleGetClassAttendance(class_id){
     for(const a of todays_attendance){
         todayMap[a.student_id.toString()] = a.status;
 
-        if(a.status === 'Present') todayPresent++;
-        if(a.status === 'Absent') todayAbsent++;
+        if(a.status === 'P') todayPresent++;
+        if(a.status === 'A') todayAbsent++;
     }
 
     // ---------- OVERALL DATA ----------

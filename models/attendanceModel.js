@@ -13,7 +13,7 @@ const attendanceSchema = new mongoose.Schema({
   }},
   status: { 
     type: String, 
-    enum: ["P", "A", "ML","L"],   // Present, Absent, Medical Leave, Leave
+    enum: ["P", "A","L"],   // Present, Absent, Leave
     required: true 
   }
 }, { timestamps: true });

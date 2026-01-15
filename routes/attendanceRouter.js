@@ -22,7 +22,7 @@ router.get('/allowed-class/:id',checkAllowedClass)
 // req: class_id  // res: {class_attendance_percentage,total_present,total_absent,students:[{student_id,name,roll_number,attendance_percentage,today_attendance}]}
 router.get('/class/:classid',getClassAttendance)
 
-//req:class_id,attendance  //res:success,message
+//req:{class_id,attendance:[student_id,status]}  //res:success,message     status:P,A only
 router.post('/save',saveDailyAttendance)
 
 //req:school_id,substitute_id   //res:success,message

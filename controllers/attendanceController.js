@@ -36,7 +36,7 @@ async function getClassAttendance(req, res, next) {
     }
 }
 
-//req:class_id,attendance  //res:success,message
+//req:{class_id,attendance:[student_id,status]}  //res:success,message     status:P,A only
 async function saveDailyAttendance(req, res, next) {
     try {
         const attendance=req.body.attendance

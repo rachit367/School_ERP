@@ -16,11 +16,11 @@ const { authenticateToken } = require('./../middlewares/authenticateToken');
 // Protect ALL routes
 router.use(authenticateToken);
 
-// req:   //res:[_id, message, title, createdAt]
+//req:   //res: [{_id, message, title, createdAt}]
 // FOR PRINCIPAL + TEACHER
 router.get('/school', getSchoolAnnouncements);
 
-// req:  //res:[title, message, createdAt, _id]
+// req:  //res:[{title, message, createdAt, _id}]
 // FOR STUDENTS (class + school-wide announcements)
 router.get('/class', getClassAnnouncements);
 

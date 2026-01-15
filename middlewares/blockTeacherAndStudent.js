@@ -4,7 +4,7 @@ async function blockTeacherAndStudent(req, res, next) {
   try {
     const role=req.role
     if (
-      !user ||
+      !role ||
       role === 'Teacher' ||
       role === 'Student'
     ) {

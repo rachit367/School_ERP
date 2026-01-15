@@ -3,7 +3,7 @@ const userModel=require('./../models/userModel')
 const classModel=require('./../models/classModel')
 const getClassId=require('./../utils/classIdUtil')
 
-//req:   //res: [_id, messsage,title,createdAt,_id]
+//req:   //res: [{_id, message, title, createdAt}]
 async function handleGetSchoolAnnouncements(user_id){
     const user=await userModel.findById(user_id)
     if (user.role === 'Student') return [];
