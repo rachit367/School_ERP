@@ -1,3 +1,6 @@
+//made only for testing in local project
+
+
 const mongoose = require("mongoose")
 
 const School = require("./models/schoolModel")
