@@ -19,7 +19,7 @@ router.get('/student/:id',getStudentAttendance)     //date in YYYY-MM-DD
 //req:class_id // res: allowed(true or false)
 router.get('/allowed-class/:id',checkAllowedClass)
 
-//req:classid  //res:{payload-{student_id,name,roll_number,attendance_percent,todays_status}}
+// req: class_id  // res: {class_attendance_percentage,total_present,total_absent,students:[{student_id,name,roll_number,attendance_percentage,today_attendance}]}
 router.get('/class/:classid',getClassAttendance)
 
 //req:class_id,attendance  //res:success,message

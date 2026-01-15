@@ -193,40 +193,77 @@ async function handlesaveDailyAttendance(user_id, class_id, attendance) {
     }
 }
 
-//req:classid  //res:{payload-{student_id,name,roll_number,attendance_percent,todays_status}}
-async function handleGetClassAttendance(user_id,class_id){
+// req: class_id  // res: {class_attendance_percentage,total_present,total_absent,students:[{student_id,name,roll_number,attendance_percentage,today_attendance}]}
+async function handleGetClassAttendance(class_id){
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const classDoc=await classModel.findById(class_id)
-    .populate({path:'students',select:'studentProfile.total_presents studentProfile.total_absents _id studentProfile.roll_number name'})
-    .select('students')
-    .lean()
+    const classDoc = await classModel.findById(class_id)
+        .populate({
+            path:'students',
+            select:'studentProfile.total_presents studentProfile.total_absents _id studentProfile.roll_number name'
+        })
+        .select('students')
+        .lean();
 
-    const todays_attendance=await attendanceModel.find({class_id,date:today}).select('student_id status').lean()
-    const todayMap={}
+    // ---------- TODAY DATA ----------
+    const todays_attendance = await attendanceModel
+        .find({ class_id, date: today })
+        .select('student_id status')
+        .lean();
+
+    const todayMap = {};
+    let todayPresent = 0;
+    let todayAbsent = 0;
 
     for(const a of todays_attendance){
-        todayMap[a.student_id.toString()]=a.status;
+        todayMap[a.student_id.toString()] = a.status;
+
+        if(a.status === 'Present') todayPresent++;
+        if(a.status === 'Absent') todayAbsent++;
     }
 
-    const studentsAttendance={}
+    // ---------- OVERALL DATA ----------
+    let totalPresents = 0;
+    let totalAbsents = 0;
+
+    const studentsAttendance = [];
 
     for(const s of classDoc.students){
+
         const p = s.studentProfile?.total_presents ?? 0;
         const a = s.studentProfile?.total_absents ?? 0;
 
-        const attendance_percentage =p + a === 0 ? 0 : Number(((p / (p + a)) * 100).toFixed(2));
-        studentsAttendance[s._id]={
-            name:s.name,
-            roll_number:s.studentProfile.roll_number,
+        totalPresents += p;
+        totalAbsents += a;
+
+        const attendance_percentage =
+            p + a === 0 ? 0 : Number(((p / (p + a)) * 100).toFixed(2));
+
+        studentsAttendance.push({
+            student_id: s._id,
+            name: s.name,
+            roll_number: s.studentProfile.roll_number,
             attendance_percentage,
-            today_attendance:todayMap[s._id.toString()] ??'Not Marked'
-        }
+            today_attendance: todayMap[s._id.toString()] ?? 'Not Marked'
+        });
     }
-    return studentsAttendance
+
+    const classAttendance =
+        totalPresents + totalAbsents === 0
+            ? 0
+            : Number(((totalPresents / (totalPresents + totalAbsents)) * 100).toFixed(2));
+
+    return {
+        class_attendance_percentage: classAttendance,
+        total_present: todayPresent,
+        total_absent: todayAbsent,
+        students: studentsAttendance
+    };
 }
+
+
 
 //req:school_id,substitute_id   //res:success,message
 async function handleAssignSubstituteTeacher(user_id,substitute_id,school_id) {

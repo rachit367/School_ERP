@@ -5,18 +5,17 @@ const {authenticateToken}=require('./../middlewares/authenticateToken')
 const {isTeacher}=require('./../middlewares/isTeacher')
 
 const {
-    getTeacherClasses,
-}=require('./../controllers/teacherController')
-
+    getDoubts,
+    updateDoubt
+}=require('./../controllers/doubtController')
 
 router.use(authenticateToken)
 router.use(isTeacher)
 
-//======================CLASSES=================
+//req:user_id
+router.get('/doubt',getDoubts)
 
-//req: user_id  //res:[{id,class_name,section,total_students,class_teacher_name}]
-router.get('/assigned-classes',getTeacherClasses)
-
-
+//req:user_id,doubt_id //res:success
+router.patch('/doubt/:id',updateDoubt) //send empty reply(in body) to mark doubt as resolved
 
 module.exports=router

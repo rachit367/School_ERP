@@ -26,7 +26,7 @@ router.delete('/users/teachers/:id',deleteTeacher)
 //req:name,email,phone,role,employee_id,class_teacher_of,subjects,phone  //res:{success,message}
 router.post('/users/teachers',createTeacher)    
 
-// req: teacher_id, { class_teacher_of, classes_assigned, subjects }  // res: { success, message }
+// req: teacher_id, { class_teacher_of, subjects }  // res: { success, message }
 router.put('/users/teachers/:id',updateTeacher)  //optional fields are there
 
 

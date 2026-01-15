@@ -24,12 +24,12 @@ async function checkAllowedClass(req, res, next) {
 }
 
 
-//req:classid  //res:{payload-{student_id,name,roll_number,attendance_percent,todays_status}}
+// req: class_id  // res: {class_attendance_percentage,total_present,total_absent,students:[{student_id,name,roll_number,attendance_percentage,today_attendance}]}
 async function getClassAttendance(req, res, next) {
     try {
-        const user_id=req.user_id
         const class_id=req.params.classid
-        const result=await handleGetClassAttendance(user_id,class_id)
+        const school_id=req.school_id
+        const result=await handleGetClassAttendance(class_id,school_id)
         return res.status(200).json(result)
     } catch (err) {
         next(err);
