@@ -6,14 +6,14 @@ const leaveSchema = new mongoose.Schema({
         ref:'School',
         required:true
     },
-    student_id:{
+    student:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         required:true
     },
     status:{
         type:String,
-        enum:['approved','rejected','pending'],
+        enum:['Approved','Rejected','Pending'],
         default:'pending'
     },
     reason:{
@@ -29,10 +29,13 @@ const leaveSchema = new mongoose.Schema({
             return this.start_date
         }
     },
-    reviewed_by:{
+    class_teacher:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
-        default:null
+        required:true
+    },
+    medical_certificate:{
+        type:String  //url of certificate
     }
 
 },{timestamps:true})
