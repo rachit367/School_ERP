@@ -10,7 +10,7 @@ const errorHandling=require('./middlewares/errorHandling')
 const authRouter=require('./routes/authRouter')
 const announcementRouter=require('./routes/announcementRouter')
 const principalUserRouter=require('./routes/principalUserRouter')
-const principalDashboardRouter=require('./routes/principalDashboardRouter')
+const principalRouter=require('./routes/principalRouter')
 const attendanceRouter=require('./routes/attendanceRouter')
 const homeworkRouter=require('./routes/homeworkRouter')
 const teacherRouter=require('./routes/teacherRouter')
@@ -37,16 +37,18 @@ app.use(express.urlencoded({extended:true}));
 
 
 app.use('/api/auth',authRouter)
-app.use('/api/announcement',announcementRouter)
+
+
 
 app.use('/api/principal',principalUserRouter)
-app.use('/api/principal/dashboard',principalDashboardRouter)
+app.use('/api/principal/dashboard',principalRouter)
 
+app.use('/api/announcement',announcementRouter)
 app.use('/api/attendance',attendanceRouter)
 app.use('/api/homework',homeworkRouter)
 app.use('/api/timtable',timetableRouter)
 app.use('/api/leave',leaveRouter)
-app.use('/api/doubt'.doubtRouter)
+app.use('/api/doubt',doubtRouter)
 
 app.use('/api/teacher',teacherRouter)
 
