@@ -23,13 +23,19 @@ async function handleAddPeriod(school_id,class_id,day,subject,start,end,teacher_
         },
         {upsert:true}
     )
-
+    await userModel.findOneAndUpdate({
+        school_id,
+        _id:teacher_id
+    },{
+        $addToSet:{'teacherProfile.classes_assigned':class_id}
+    },
+    {upsert:true})
     return {success:true}
 }
 
 //req:school_id,class_id,day,period_id  //res:success
 async function handleDeletePeriod(school_id,class_id,day,period_id){
-    await timetableModel.findOneAndUpdate(
+    const timetable=await timetableModel.findOneAndUpdate(
         {school_id,class_id,day},
         {
             $pull:{
@@ -37,6 +43,21 @@ async function handleDeletePeriod(school_id,class_id,day,period_id){
             }
         }
     )
+    if (!timetable) return { success: true }
+    const teacher_id=timetable.periods.find(p=>p._id.toString()===period_id).teacher
+    const exists=await timetableModel.exists({
+        school_id,class_id,'periods.teacher':teacher_id
+    })
+    if(exists){
+        return {success:true}
+    }
+    await userModel.findOneAndUpdate({
+        school_id,
+        _id:teacher_id,
+    },{
+        $pull:{'teacherProfile.classes_assigned':class_id}
+    })
+
     return {success:true}
 }
 

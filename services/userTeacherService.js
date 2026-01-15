@@ -111,38 +111,28 @@ async function handleDeleteTeacher(teacher_id,school_id) {
 }
 
 //req:name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects  //res:{success,message}
-async function handleCreateTeacher(user_id,name,email,phone,role,employee_id,class_teacher_of,classes_assigned,subjects){
-    const user=await userModel.findById(user_id)
-    .select('school_id');
+async function handleCreateTeacher(name,email,phone,role,employee_id,class_teacher_of,subjects,school_id){
     const designation = class_teacher_of ? 'Mentor' : 'ST';
     let classTeacherOfId = null;
     if (class_teacher_of) {
-        classTeacherOfId = await getClassId(class_teacher_of, user.school_id);
+        classTeacherOfId = await getClassId(class_teacher_of, school_id);
     }
-    let assignedClassIds = [];
-    if (Array.isArray(classes_assigned) && classes_assigned.length > 0) {
-        assignedClassIds = await Promise.all(
-            classes_assigned.map(cls =>
-                getClassId(cls, user.school_id)
-            )
-        );
-    }
+
     const teacher=await userModel.create({
         name:name,
         email:email,
         phone:phone,
         role:role,
-        school_id:user.school_id,
+        school_id:school_id,
         teacherProfile:{
             employee_id:employee_id,
             class_teacher_of:classTeacherOfId,
-            classes_assigned:assignedClassIds,
             designation:designation,
             subjects:subjects
         }
     });
     await schoolModel.findByIdAndUpdate(
-    user.school_id,
+    school_id,
     { $inc: { total_teachers: 1 } }
     );
     if (classTeacherOfId!==null){
@@ -151,6 +141,7 @@ async function handleCreateTeacher(user_id,name,email,phone,role,employee_id,cla
     return {success:true,message:"Teacher created successfully"}
 } 
 
+// req: teacher_id, { class_teacher_of, subjects }  // res: { success, message }
 async function handleUpdateTeacher(teacher_id,payload) {
     const teacher=await userModel.findById(teacher_id)
     .select('teacherProfile school_id _id')
@@ -194,16 +185,6 @@ async function handleUpdateTeacher(teacher_id,payload) {
         }
     }
         
-    if (Array.isArray(payload.classes_assigned)) {
-        const classIds = [];
-
-        for (let cls of payload.classes_assigned) {
-            const classId = await getClassId(cls, school_id);
-            classIds.push(classId);
-        }
-
-        profile.classes_assigned = classIds;
-    }
 
     if (Array.isArray(payload.subjects)) {
         profile.subjects = payload.subjects;
@@ -216,6 +197,7 @@ async function handleUpdateTeacher(teacher_id,payload) {
     };
 
 }
+
 module.exports={
     handleGetAllTeachers,
     handleGetTeacher,

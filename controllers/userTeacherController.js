@@ -23,10 +23,9 @@ async function getTeacher(req,res,next) {
     }
 }
 
-//req:name,email,role,employee_id,class_teacher_of,classes_assigned,designation,subjects  //res:{success,message}
+//req:name,email,phone,role,employee_id,class_teacher_of,designation,subjects  //res:{success,message}
 async function createTeacher(req,res,next){
     try{
-        const user_id = req.user_id;
         const {
             name,
             email,
@@ -34,19 +33,18 @@ async function createTeacher(req,res,next){
             phone,
             employee_id,
             class_teacher_of,
-            classes_assigned,
             subjects
         } = req.body;
+        const school_id=req.school_id
         const response = await handleCreateTeacher(
-            user_id,
             name,
             email,
             phone,
             role,
             employee_id,
             class_teacher_of,
-            classes_assigned,
-            subjects
+            subjects,
+            school_id
         );
         return res.status(200).json(response);
     }catch(err){
@@ -64,6 +62,7 @@ async function deleteTeacher(req,res,next) {
     }
 }
 
+//req:
 async function updateTeacher(req,res,next){
     try{    
         const response=await handleUpdateTeacher(req.params.id,req.body)
