@@ -12,10 +12,14 @@ const {
 router.use(authenticateToken)
 router.use(isTeacher)
 
+//=============TEACHER=============
+
 //req:user_id
-router.get('/doubt',getDoubts)
+router.get('/',getDoubts)
 
 //req:user_id,doubt_id //res:success
-router.patch('/doubt/:id',updateDoubt) //send empty reply(in body) to mark doubt as resolved
+router.patch('/:id',updateDoubt) //send empty reply(in body) to mark doubt as resolved
+
+//==============Student==============
 
 module.exports=router

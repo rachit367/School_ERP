@@ -1,5 +1,6 @@
-const schoolModel=require('./../models/schoolModel')
-const classAttendanceSummaryModel=require('./../models/classAttendaceSummaryModel')
+const schoolModel=require('../models/schoolModel')
+const classAttendanceSummaryModel=require('../models/classAttendaceSummaryModel')
+const bullyModel=require('./../models/bullyModel');
 
 // req: school_id  // res: { total_students, total_teachers, total_absents, [class_name]: { [section]: { attendance, class_teacher } } }
 async function handleGetStats(school_id){
@@ -40,6 +41,35 @@ async function handleGetStats(school_id){
     return result
 }
 
+//req:    //res:bully_name,status,description,reported_by.name,bully_class
+async function handleGetAllBullyReport(school_id){
+    const reports=await bullyModel.find({school_id})
+    .populate({path:'reported_by',select:'name'})
+    .lean()
+    return  reports
+}
 
+//req:report_id   //res:success  
+async function handleMarkBullyReport(school_id,report_id){
+    await bullyModel.findOneAndUpdate({
+        school_id,
+        _id:report_id
+    },
+    {
+        status:'Resolved'
+    })
+    return {success:true}
+}
 
-module.exports={handleGetStats}
+//req:report_id   //res:success  
+async function handleDeleteBullyReport(school_id,report_id) {
+    await bullyModel.findOneAndDelete({school_id,_id:report_id})
+    return {success:true}
+}
+
+module.exports={
+    handleGetStats,
+    handleGetAllBullyReport,
+    handleDeleteBullyReport,
+    handleMarkBullyReport
+}
