@@ -24,7 +24,7 @@ async function handleGetStats(school_id){
 
     const total_students=school.total_students
     const total_teachers=school.total_teachers
-    const result={total_students,total_teachers,total_absents:0}
+    let result={total_students,total_teachers,total_absents:0}
     for(const item of summaries){
         const class_name=item.class_id.class_name;
         const section=item.section;
@@ -34,6 +34,7 @@ async function handleGetStats(school_id){
             }
         result.total_absents+=item.absent_count
         result[class_name][section] = {
+        _id:item.class_id,
         attendance: item.attendance_percent,
         class_teacher: teacher_name
         };
