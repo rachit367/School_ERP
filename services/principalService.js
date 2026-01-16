@@ -2,7 +2,7 @@ const schoolModel=require('../models/schoolModel')
 const classAttendanceSummaryModel=require('../models/classAttendaceSummaryModel')
 const bullyModel=require('./../models/bullyModel');
 
-// req: school_id  // res: { total_students, total_teachers, total_absents, [class_name]: { [section]: { attendance, class_teacher } } }
+// req: school_id  // res: { total_students, total_teachers, total_absents, [class_name]: { [section]: { _id,attendance, class_teacher } } }
 async function handleGetStats(school_id){
     const date = new Date();
     date.setHours(0, 0, 0, 0);
