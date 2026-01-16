@@ -1,11 +1,11 @@
 const userModel=require('./../models/userModel')
 const attendanceModel=require('./../models/attendanceModel')
-const classAttendanceModel=require('./../models/classAttendaceSummaryModel')
+const classAttendanceModel=require('../models/classAttendanceSummaryModel')
 const classModel=require('./../models/classModel')
 const {canMarkAttendance}=require('../utils/canMarkAttendance')
 const mongoose = require('mongoose');
 
-//req:class_id // res: allowed(true or false)
+//req:class_id // res: allowed(true or false)  //alaways run this api before attendance and before adding uss teacher
 async function handleCheckAllowedClass(user_id,class_id,school_id) {
     const exists=await classModel.exists({
         _id:class_id,
@@ -266,8 +266,11 @@ async function handleGetClassAttendance(class_id,school_id){
 
 
 //req:school_id,substitute_id   //res:success,message
-async function handleAssignSubstituteTeacher(user_id,substitute_id,school_id) {
+async function handleAssignSubstituteTeacher(user_id,substitute_id,school_id) {  
     const classDoc=await classModel.findOne({ class_teacher: user_id, school_id });
+    if (!classDoc) {
+        throw new Error("You are not a class teacher or class not found");
+    }
     await classModel.updateOne(
         { _id: classDoc._id },
         { $addToSet: { allowed_attendance_teachers: substitute_id } }

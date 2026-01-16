@@ -1,11 +1,12 @@
 const userModel=require('../models/userModel')
 const getClassId=require('../utils/classIdUtil')
 const classModel=require('../models/classModel')
+const schoolModel=require('./../models/schoolModel')
 
 //req:  //res: [{ _id, name, role, designation, subjects, classes_assigned }]
 async function handleGetAllTeachers(school_id) {
     const teachers=await userModel.find({
-        school_id:user.school_id,
+        school_id:school_id,
         role:'Teacher'})
         .populate([
         {

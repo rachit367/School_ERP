@@ -3,6 +3,8 @@ const classModel=require('../models/classModel');
 const {calculateAge}=require('../utils/calculateAge');
 const {formatDOB}=require('../utils/formatDOB')
 const schoolModel=require('../models/schoolModel')
+const attendanceModel=require('./../models/attendanceModel')
+
 //req:school_id  //res:class_name,total_students,total_sections
 async function handleGetClasses(school_id){
     const classes=await classModel.find({school_id:school_id})

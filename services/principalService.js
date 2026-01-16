@@ -1,5 +1,5 @@
 const schoolModel=require('../models/schoolModel')
-const classAttendanceSummaryModel=require('../models/classAttendaceSummaryModel')
+const classAttendanceSummaryModel=require('../models/classAttendanceSummaryModel')
 const bullyModel=require('./../models/bullyModel');
 
 // req: school_id  // res: { total_students, total_teachers, total_absents, [class_name]: { [section]: { _id,attendance, class_teacher } } }

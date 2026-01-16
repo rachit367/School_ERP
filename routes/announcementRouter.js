@@ -24,7 +24,7 @@ router.get('/school', getSchoolAnnouncements);
 // FOR STUDENTS (class + school-wide announcements)
 router.get('/class', getClassAnnouncements);
 
-// req: topic, school:[true/false], class:[], description
+// req: topic, school:[true,false], classes:[], description
 // res: { success:true }
 // CREATE ANNOUNCEMENT
 router.post('/create', createAnnouncement);

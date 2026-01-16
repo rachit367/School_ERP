@@ -11,9 +11,9 @@ const {
 //req:   //res: [{_id, message, title, createdAt}]
 async function getSchoolAnnouncements(req, res, next) {
     try {
-        const user_id = req.user_id;
+        const school_id = req.school_id;
 
-        const announcements = await handleGetSchoolAnnouncements(user_id);
+        const announcements = await handleGetSchoolAnnouncements(school_id);
 
         return res.status(200).json(announcements);
 
