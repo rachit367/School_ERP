@@ -1,4 +1,6 @@
 const userModel=require('./../models/userModel')
+const leaveModel=require('./../models/leaveModel')
+const doubtModel=require('./../models/doubtModel')
 
 //req: user_id  //res:[{id,class_name,section,total_students,class_teacher_name}]
 
@@ -41,7 +43,13 @@ async function handleGetTeacherClasses(user_id) {
     return result;
 }
 
+async function handleGetInsights(user_id,school_id) {
+    const pendingLeaveRequests=await leaveModel.countDocuments({school_id,class_teacher:user_id,status:'Pending'})
+    const pendingDoubts=await doubtModel.countDocuments({school_id,teacher:user_id,status:'Pending'})
+    return {pendingDoubts,pendingLeaveRequests}
+}
 
 module.exports={
-    handleGetTeacherClasses
+    handleGetTeacherClasses,
+    handleGetInsights
 }
