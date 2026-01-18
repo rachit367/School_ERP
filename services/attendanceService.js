@@ -263,8 +263,6 @@ async function handleGetClassAttendance(class_id,school_id){
     };
 }
 
-
-
 //req:school_id,substitute_id   //res:success,message
 async function handleAssignSubstituteTeacher(user_id,substitute_id,school_id) {  
     const classDoc=await classModel.findOne({ class_teacher: user_id, school_id });
@@ -352,10 +350,38 @@ async function handleGetStudentAttendance(from_date,to_date,student_id){  //date
     }
 }
 
+//req:    //res:P,A,L,overall,total_classes
+async function handleGetOverallAttendance(school_id,student_id) {
+    const stats=await attendanceModel.aggregate([
+    {
+        $match:{student_id}
+    },
+    {
+        $group:{
+            _id:"$status",
+            count:{$sum:1}
+        }
+    }]
+    )
+
+    let result={P:0,A:0,L:0,overall:0,total_classes:0}
+    stats.forEach(item=>{
+        result[item._id]=item.count
+    })
+
+    result.total_classes=result.A+result.P+result.L
+    result.overall=((result.P/(result.total_classes))*100).toFixed(2)
+    
+    return result
+    
+}
+
 module.exports={
     handleCheckAllowedClass,
     handleGetClassAttendance,
     handlesaveDailyAttendance,
     handleAssignSubstituteTeacher,
     handleRemoveSubstituteTeacher,
-    handleGetStudentAttendance}
+    handleGetStudentAttendance,
+    handleGetOverallAttendance
+}

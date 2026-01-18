@@ -5,7 +5,9 @@ const {
     handleAssignSubstituteTeacher,
     handleRemoveSubstituteTeacher,
     handleGetStudentAttendance,
-    handleGetClassAttendance}=require('./../services/attendanceService')
+    handleGetClassAttendance,
+    handleGetOverallAttendance
+}=require('./../services/attendanceService')
 
 //req:class_id // res: allowed(true or false)
 async function checkAllowedClass(req, res, next) {
@@ -83,6 +85,17 @@ async function getStudentAttendance(req, res, next) {
         return res.status(200).json(result)
     } catch (err) {
         next(err);
+    }
+}
+
+async function getOverallAttendance(req,res,next) {
+    try{
+        const student_id=req.user_id
+        const school_id=req.school_id
+        const data=await handleGetOverallAttendance(school_id,student_id)
+        return res.status(200).json(data)
+    }catch(err){
+        next(err)
     }
 }
 
