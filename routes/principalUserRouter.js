@@ -14,7 +14,7 @@ const {
 
 router.use(authenticateToken);
 
-//req:  //res: [{ _id, name, role, designation, subjects, classes_assigned:[] }]
+//req:  //res: [{ _id, name, role, designation, subjects, classes_assigned:[],announcement_allowed }]
 router.get('/users/teachers',getAllTeachers)
 
 // req: teacher_id  //res: {_id, name, phone, email, employee_id, designation, subjects, class_teacher_of, classes_assigned }

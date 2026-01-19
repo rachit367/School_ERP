@@ -3,7 +3,7 @@ const getClassId=require('../utils/classIdUtil')
 const classModel=require('../models/classModel')
 const schoolModel=require('./../models/schoolModel')
 
-//req:  //res: [{ _id, name, role, designation, subjects, classes_assigned }]
+//req:  //res: [{ _id, name, role, designation, subjects, classes_assigned,announcement_allowed }]
 async function handleGetAllTeachers(school_id) {
     const teachers=await userModel.find({
         school_id:school_id,
@@ -26,6 +26,7 @@ async function handleGetAllTeachers(school_id) {
             teacherProfile.subjects
             teacherProfile.classes_assigned
             teacherProfile.class_teacher_of
+            teacherPRofile.announcement_allowed
         `)
     return teachers.map(t=>({
         _id:t._id,
@@ -33,6 +34,7 @@ async function handleGetAllTeachers(school_id) {
         role:t.role,
         designation:t.teacherProfile?.designation ?? '',
         subjects:t.teacherProfile?.subjects ?? [],
+        announcement_allowed:t.teacherProfile.announcement_allowed,
         class_teacher_of:t.teacherProfile?.class_teacher_of
         ? `${t.teacherProfile.class_teacher_of.class_name}-${t.teacherProfile.class_teacher_of.section}`
         : '',
