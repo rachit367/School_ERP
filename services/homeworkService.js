@@ -90,9 +90,61 @@ async function handleGetClassHomework(class_id,user_id) {
     return payload
 
 }
+
+//req:class_id,teacher_id  //res:{completed,pending,submitted}-each is an array of {_id,topic,description,attachments,deadline}
+async function handleGetSubjectHomeworks(school_id,class_id,teacher_id,student_id) {
+    const homeworks=await homeworkModel.find({school_id,class_id:class_id,created_by:teacher_id})
+    .lean();
+
+    let completed = []
+    let submitted = []
+    let pending = []
+
+    for(let hw of homeworks){
+        const submission = hw.submitted_by?.find(s => s.student_id.toString() === student_id.toString())
+        delete hw.submitted_by;
+        delete hw.school_id;
+        delete hw.class_id;
+        delete hw.created_by
+        if (!submission) {
+            // Not submitted
+            pending.push(hw)
+        } 
+        else {
+            //Submitted
+            if (hw.deadline && submission.submitted_at <= hw.deadline) {
+                completed.push(hw) // on time
+            } else {
+                submitted.push(hw) // late
+            }
+        }
+        
+    }
+    return {completed,pending,submitted}
+}
+
+//req:class_id,homework_id  //res:topic,description,deadline,_id
+async function handleGetStudentHomeworkDetails(homework_id,school_id,class_id) {
+    const homework=await homeworkModel.findOne({
+        _id:homework_id,
+        school_id,
+        class_id
+    })
+    .select('topic _id description deadline')
+    .lean()
+    return homework
+}
+
+async function handlePostHomework(homework_id,payload) {  //TODO after s3 bucket access
+    return {success:true}
+}
+
 module.exports={
     handleGetAllHomeworks,
     handleGetHomeworkDetails,
     handlePostHomework,
-    handleGetClassHomework
+    handleGetClassHomework,
+    handleGetSubjectHomeworks,
+    handlePostHomework,
+    handleGetStudentHomeworkDetails
 }

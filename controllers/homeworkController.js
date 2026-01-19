@@ -2,7 +2,10 @@ const {
     handleGetAllHomeworks,
     handleGetHomeworkDetails,
     handlePostHomework,
-    handleGetClassHomework
+    handleGetClassHomework,
+    handleGetSubjectHomeworks,
+    handlePostHomework,
+    handleGetStudentHomeworkDetails
 }=require('./../services/homeworkService')
 
 // req:  // res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
@@ -58,9 +61,47 @@ async function getClassHomework(req,res,next) {
     }
 }
 
+async function getSubjectHomeworks(req, res, next){
+  try {
+    const school_id=req.school_id
+    const user_id=req.user_id
+    const class_id=req.query.class_id
+    const teacher_id=req.query.teacher_id
+    const data=await handleGetSubjectHomeworks(school_id,class_id,teacher_id,user_id)
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+};
+
+async function getStudentHomeworkDetails(req, res, next){
+  try {
+    const school_id=req.school_id
+    const user_id=req.user_id
+    const homework_id=req.query.homework_id
+    const class_id=req.query.class_id
+    const data=await handleGetStudentHomeworkDetails(homework_id,school_id,class_id)
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+};
+
+async function postHomework(req, res, next){
+  try {
+    const data=await handlePostHomework
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports={
     getAllHomeworks,
     getHomeworkDetails,
     postHomework,
-    getClassHomework
+    getClassHomework,
+    getSubjectHomeworks,
+    postHomework,
+    getStudentHomeworkDetails
 }

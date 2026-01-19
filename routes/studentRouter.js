@@ -8,7 +8,7 @@ const{
 
 router.use(authenticateToken)
 
-//req:   //res:[{subject,teacher}]
+//req:   //res:[{subject,teacher,teacher_id}]
 router.get('/subjects',getAllSubjects)
 
 

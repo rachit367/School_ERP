@@ -6,7 +6,10 @@ const {
     getAllHomeworks,
     getHomeworkDetails,
     postHomework,
-    getClassHomework
+    getClassHomework,
+    getSubjectHomeworks,
+    postHomework,
+    getStudentHomeworkDetails
 }=require('./../controllers/homeworkController')
 
 router.use(authenticateToken)
@@ -26,6 +29,14 @@ router.get('/:id',isTeacher,getHomeworkDetails)
 router.post('/',isTeacher,postHomework)
 
 //========================STUDENT==========================
+
+//req:class_id,teacher_id  //res:{completed,pending,submitted}-each is an array of {_id,topic,description,attachments,deadline}
+router.get('/student',getSubjectHomeworks)
+
+router.get('/student/:id',getStudentHomeworkDetails)
+
+//req:homework_id  //res:success
+router.post('/submit',postHomework)
 
 
 

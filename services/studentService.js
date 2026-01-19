@@ -1,6 +1,6 @@
 const subjectModel=require('./../models/subjectModel')
 
-//req:   //res:[{subject,teacher}]
+//req:   //res:[{subject,teacher,teacher_id}]
 async function handleGetAllSubjects(student_id,school_id) {
     const user=await userModel.findOne({_id:student_id})
     .select('studentProfile.class_id')
@@ -13,7 +13,8 @@ async function handleGetAllSubjects(student_id,school_id) {
 
     let payload=subjects.map(s=>({
         subject:s.name,
-        teacher:s.teacher_id?.name ??''
+        teacher:s.teacher_id?.name ??'',
+        teacher_id:s.teacher_id._id
     }))
     return payload
 }
