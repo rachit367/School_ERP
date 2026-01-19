@@ -17,6 +17,7 @@ const teacherRouter=require('./routes/teacherRouter')
 const timetableRouter=require('./routes/timetableRouter')
 const leaveRouter=require('./routes/leaveRouter')
 const doubtRouter=require('./routes/doubtRouter')
+const studentRouter=require('./routes/studentRouter')
 
 connectDB()
 
@@ -41,6 +42,9 @@ app.use('/api/auth',authRouter)
 
 
 app.use('/api/principal',principalUserRouter)
+app.use('/api/teacher',teacherRouter)
+app.use('/api/student',studentRouter)
+
 app.use('/api/principal/dashboard',principalRouter)
 
 app.use('/api/announcement',announcementRouter)
@@ -50,7 +54,6 @@ app.use('/api/timetable',timetableRouter)
 app.use('/api/leave',leaveRouter)
 app.use('/api/doubt',doubtRouter)
 
-app.use('/api/teacher',teacherRouter)
 
 
 app.use(errorHandling)
