@@ -135,7 +135,7 @@ async function handleGetStudentHomeworkDetails(homework_id,school_id,class_id) {
     return homework
 }
 
-async function handlePostHomework(homework_id,payload) {  //TODO after s3 bucket access
+async function handleSubmitHomework() {  //TODO after s3 bucket access
     return {success:true}
 }
 
@@ -145,6 +145,6 @@ module.exports={
     handlePostHomework,
     handleGetClassHomework,
     handleGetSubjectHomeworks,
-    handlePostHomework,
+    handleSubmitHomework,
     handleGetStudentHomeworkDetails
 }

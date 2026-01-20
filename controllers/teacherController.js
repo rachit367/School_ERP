@@ -18,7 +18,7 @@ async function getInsights(req,res,next) {
     try{
         const user_id=req.user_id
         const school_id=req.school_id
-        const data=handleGetInsights(user_id,school_id)
+        const data=await handleGetInsights(user_id,school_id)
         return res.status(200).json(data)
     }catch(err){
         next(err)

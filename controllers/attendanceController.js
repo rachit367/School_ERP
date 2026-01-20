@@ -105,5 +105,6 @@ module.exports = {
     saveDailyAttendance,
     assignSubstituteTeacher,
     removeSubstituteTeacher,
-    getStudentAttendance
+    getStudentAttendance,
+    getOverallAttendance
 };

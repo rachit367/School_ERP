@@ -4,7 +4,7 @@ const {
     handlePostHomework,
     handleGetClassHomework,
     handleGetSubjectHomeworks,
-    handlePostHomework,
+    handleSubmitHomework,
     handleGetStudentHomeworkDetails
 }=require('./../services/homeworkService')
 
@@ -87,9 +87,9 @@ async function getStudentHomeworkDetails(req, res, next){
   }
 };
 
-async function postHomework(req, res, next){
+async function submitHomework(req, res, next){
   try {
-    const data=await handlePostHomework
+    const data=await handleSubmitHomework()
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -103,5 +103,6 @@ module.exports={
     getClassHomework,
     getSubjectHomeworks,
     postHomework,
-    getStudentHomeworkDetails
+    getStudentHomeworkDetails,
+    submitHomework
 }

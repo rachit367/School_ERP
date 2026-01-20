@@ -34,7 +34,7 @@ async function updateDoubt(req, res, next){
 async function postDoubt(req, res, next){
   try {
     const school_id=req.school_id
-    const student_id=req.student_id
+    const student_id=req.user_id
     const doubt=req.body.doubt
     const class_id=req.body.class_id
     const teacher_id=req.body.teacher_id

@@ -62,11 +62,46 @@ Get all classes assigned to the authenticated teacher.
 
 ---
 
+### 2. Get Teacher Insights/Dashboard Data
+Get dashboard insights and statistics for the authenticated teacher.
+
+**Endpoint**: `GET /api/teacher/insights`
+
+**Authentication Required**: Yes (Teacher only)
+
+**Request**: No parameters required
+
+**Success Response** (200):
+```json
+{
+  "total_homeworks": 15,
+  "pending_doubts": 8,
+  "total_classes": 3,
+  "total_students": 85,
+  "recent_activity": [...],
+  "upcoming_deadlines": [...]
+}
+```
+
+| Response Field | Type | Description |
+|----------------|------|-------------|
+| total_homeworks | Number | Total number of homeworks created by teacher |
+| pending_doubts | Number | Number of unresolved student doubts |
+| total_classes | Number | Number of classes assigned to teacher |
+| total_students | Number | Total students across all classes |
+| recent_activity | Array | Recent activities (optional) |
+| upcoming_deadlines | Array | Upcoming homework deadlines (optional) |
+
+**Note**: The exact response structure may vary based on the service implementation. The above represents common dashboard metrics.
+
+---
+
 ## Access Control
 
 | Endpoint | Student | Teacher | Principal |
 |----------|---------|---------|-----------|
 | GET /assigned-classes | ❌ | ✅ | ❌* |
+| GET /insights | ❌ | ✅ | ❌* |
 
 *Principal would need to use different endpoints specific to their role
 

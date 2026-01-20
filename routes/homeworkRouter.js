@@ -8,7 +8,7 @@ const {
     postHomework,
     getClassHomework,
     getSubjectHomeworks,
-    postHomework,
+    submitHomework,
     getStudentHomeworkDetails
 }=require('./../controllers/homeworkController')
 
@@ -36,7 +36,7 @@ router.get('/student',getSubjectHomeworks)
 router.get('/student/:id',getStudentHomeworkDetails)
 
 //req:homework_id  //res:success
-router.post('/submit',postHomework)
+router.post('/submit',submitHomework)
 
 
 
