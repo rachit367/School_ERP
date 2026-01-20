@@ -116,6 +116,7 @@ async function handleStudentTimetable(class_id,school_id){
     }))
     return payload
 }
+
 // req: teacher_id, school_id  // res: [{ day, periods:[{_id,class_name,section,subject,start,end,location}] }]
 async function handleTeacherTimetable(teacher_id,school_id){
     const tt=await timetableModel.find({school_id:school_id,'periods.teacher':teacher_id})
