@@ -41,7 +41,7 @@ async function deleteBullyReport(req, res, next){
     const school_id=req.school_id
     const report_id=req.params.id
     const data=await handleDeleteBullyReport(school_id,report_id)
-    res.status(200).json(data);
+    return res.status(200).json(data);
   } catch (err) {
     next(err);
   }

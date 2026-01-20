@@ -20,6 +20,9 @@ const subjectSchema = new mongoose.Schema({
         ref:'Class',
         required:true
     },
+    resources:[{
+        type:String
+    }]
     
 })
 subjectSchema.index({school_id:1,class_id:1})

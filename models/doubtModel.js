@@ -11,8 +11,14 @@ const doubtSchema = new mongoose.Schema({
         ref:'User',
         required:true
     },
-    student_name:String,
-    class_name:String,
+    class_id:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Class'
+    },
+    subject:{
+        type:String,
+        set: v => v.replace(/\b\w/g, c => c.toUpperCase())
+    },
     teacher:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
