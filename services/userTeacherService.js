@@ -26,7 +26,7 @@ async function handleGetAllTeachers(school_id) {
             teacherProfile.subjects
             teacherProfile.classes_assigned
             teacherProfile.class_teacher_of
-            teacherPRofile.announcement_allowed
+            teacherProfile.announcement_allowed
         `)
     return teachers.map(t=>({
         _id:t._id,
