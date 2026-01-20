@@ -1,3 +1,4 @@
+const subjectModel = require('../models/subjectModel');
 const timetableModel=require('./../models/timetableModel');
 const userModel=require('./../models/userModel');
 const {timeToMin}=require('./../utils/timeToMin')
@@ -21,44 +22,78 @@ async function handleAddPeriod(school_id,class_id,day,subject,start,end,teacher_
                 periods:{subject,start,end,location,teacher:teacher_id}
             }
         },
-        {upsert:true}
-    )
+    {upsert:true});
+
     await userModel.findOneAndUpdate({
         school_id,
         _id:teacher_id
     },{
         $addToSet:{'teacherProfile.classes_assigned':class_id}
     },
-    {upsert:true})
+    {upsert:true});
+
+    await subjectModel.findOneAndUpdate(
+    { name:subject, teacher_id, class_id, school_id },
+    { $setOnInsert:{ name:subject, teacher_id, class_id, school_id }},
+    { upsert:true }
+)
+
     return {success:true}
 }
 
 //req:school_id,class_id,day,period_id  //res:success
 async function handleDeletePeriod(school_id,class_id,day,period_id){
-    const timetable=await timetableModel.findOneAndUpdate(
-        {school_id,class_id,day},
-        {
-            $pull:{
-                periods:{_id:period_id}
-            }
-        }
-    )
-    if (!timetable) return { success: true }
-    const teacher_id=timetable.periods.find(p=>p._id.toString()===period_id).teacher
-    const exists=await timetableModel.exists({
-        school_id,class_id,'periods.teacher':teacher_id
-    })
-    if(exists){
-        return {success:true}
-    }
-    await userModel.findOneAndUpdate({
-        school_id,
-        _id:teacher_id,
-    },{
-        $pull:{'teacherProfile.classes_assigned':class_id}
-    })
 
-    return {success:true}
+    // 1. Fetch only required period (projection)
+    const timetable = await timetableModel.findOne(
+        { school_id, class_id, day, 'periods._id': period_id },
+        { 'periods.$': 1 }   // returns only matched period
+    ).lean()
+
+    if(!timetable || !timetable.periods.length)
+        return { success:false, message:"Period not found" }
+
+    const { teacher, subject } = timetable.periods[0]
+
+    // 2. Delete period
+    await timetableModel.updateOne(
+        { school_id, class_id, day },
+        { $pull:{ periods:{ _id:period_id } } }
+    )
+
+    // 3. Parallel checks (faster)
+    const [teacherExists, subjectExists] = await Promise.all([
+        timetableModel.exists({
+            school_id,
+            class_id,
+            'periods.teacher': teacher
+        }),
+        timetableModel.exists({
+            school_id,
+            class_id,
+            'periods.subject': subject
+        })
+    ])
+
+    // 4. Cleanup subject
+    if(!subjectExists){
+        await subjectModel.deleteOne({
+            school_id,
+            class_id,
+            teacher_id: teacher,
+            name: subject
+        })
+    }
+
+    // 5. Cleanup teacher
+    if(!teacherExists){
+        await userModel.updateOne(
+            { school_id, _id: teacher },
+            { $pull:{ 'teacherProfile.classes_assigned': class_id } }
+        )
+    }
+
+    return { success:true }
 }
 
 //req:class_id,school_id,  // res: [{ day, periods:[{_id,start,end,teacher_name,location,subject}] }]
