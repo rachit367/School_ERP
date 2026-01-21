@@ -10,7 +10,7 @@ async function isAdminAuthenticated(req, res, next) {
             return res.redirect('/admin/login');
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'admin-secret-key');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const admin = await Admin.findById(decoded.id);
 
         if (!admin) {
@@ -33,7 +33,7 @@ async function isAdminLoggedIn(req, res, next) {
         const token = req.cookies?.adminToken || req.session?.adminToken;
 
         if (token) {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'admin-secret-key');
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const admin = await Admin.findById(decoded.id);
 
             if (admin) {
@@ -50,7 +50,7 @@ async function isAdminLoggedIn(req, res, next) {
 function generateAdminToken(adminId) {
     return jwt.sign(
         { id: adminId },
-        process.env.JWT_SECRET || 'admin-secret-key',
+        process.env.JWT_SECRET,
         { expiresIn: '24h' }
     );
 }
