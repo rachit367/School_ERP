@@ -1,0 +1,229 @@
+<%- include('../partials/header') %>
+
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle: 'Promote Students - ' + school.name }) %>
+
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools">Schools</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools/<%= school._id %>">
+                                <%= school.name %>
+                            </a></li>
+                        <li class="breadcrumb-item active">Promote Students</li>
+                    </ol>
+                </nav>
+
+                <!-- Success/Error Messages -->
+                <% if (typeof success !=='undefined' && success) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <%= success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <% } %>
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <% } %>
+
+                                <!-- Header -->
+                                <div class="mb-4">
+                                    <h2 class="mb-1"><i class="bi bi-arrow-up-circle me-2 text-success"></i>Promote
+                                        Students</h2>
+                                    <p class="text-muted mb-0">Move students to next class or section for <%=
+                                            school.name %>
+                                    </p>
+                                </div>
+
+                                <div class="row">
+                                    <!-- Manual Promotion -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-header bg-primary text-white">
+                                                <i class="bi bi-person-check me-2"></i>Manual Class Promotion
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="text-muted mb-4">Promote students from one specific class to
+                                                    another</p>
+
+                                                <form action="/admin/schools/<%= school._id %>/promote" method="POST"
+                                                    id="manualPromoteForm">
+                                                    <div class="mb-3">
+                                                        <label for="fromClass" class="form-label"><strong>From
+                                                                Class</strong></label>
+                                                        <select name="fromClassId" id="fromClass" class="form-select"
+                                                            required>
+                                                            <option value="">-- Select Source Class --</option>
+                                                            <% if (classes && classes.length> 0) { %>
+                                                                <% classes.forEach(cls=> { %>
+                                                                    <option value="<%= cls._id %>"
+                                                                        data-students="<%= cls.students ? cls.students.length : 0 %>">
+                                                                        Class <%= cls.class_name %>-<%= cls.section %>
+                                                                                (<%= cls.students ? cls.students.length
+                                                                                    : 0 %> students)
+                                                                    </option>
+                                                                    <% }) %>
+                                                                        <% } %>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="text-center my-3">
+                                                        <i class="bi bi-arrow-down text-success"
+                                                            style="font-size: 2rem;"></i>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="toClass" class="form-label"><strong>To
+                                                                Class</strong></label>
+                                                        <select name="toClassId" id="toClass" class="form-select"
+                                                            required>
+                                                            <option value="">-- Select Destination Class --</option>
+                                                            <% if (classes && classes.length> 0) { %>
+                                                                <% classes.forEach(cls=> { %>
+                                                                    <option value="<%= cls._id %>">
+                                                                        Class <%= cls.class_name %>-<%= cls.section %>
+                                                                    </option>
+                                                                    <% }) %>
+                                                                        <% } %>
+                                                        </select>
+                                                    </div>
+
+                                                    <div id="promotionPreview" class="alert alert-info d-none mb-3">
+                                                        <strong>Preview:</strong> <span id="previewText"></span>
+                                                    </div>
+
+                                                    <button type="submit" class="btn btn-success w-100" id="promoteBtn"
+                                                        disabled>
+                                                        <i class="bi bi-arrow-up-circle me-2"></i>Promote Students
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Automatic School-Wide Promotion -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card h-100 border-warning">
+                                            <div class="card-header bg-warning text-dark">
+                                                <i class="bi bi-lightning-charge me-2"></i>Automatic School-Wide
+                                                Promotion
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="alert alert-warning">
+                                                    <strong><i
+                                                            class="bi bi-exclamation-triangle me-2"></i>Warning!</strong>
+                                                    <p class="mb-0">This will automatically promote ALL students across
+                                                        all classes to the next grade level.</p>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <h6 class="mb-3">Promotion Rules:</h6>
+                                                    <ul class="text-muted" style="font-size: 0.9rem;">
+                                                        <li>Class 1 → Class 2 (same section)</li>
+                                                        <li>Class 2 → Class 3 (same section)</li>
+                                                        <li>... and so on</li>
+                                                        <li>Students in highest class will remain in same class</li>
+                                                        <li>Attendance records will be preserved</li>
+                                                    </ul>
+                                                </div>
+
+                                                <% if (classes && classes.length> 0) { %>
+                                                    <div class="card bg-light mb-3">
+                                                        <div class="card-body">
+                                                            <h6 class="mb-2">Current Classes:</h6>
+                                                            <div class="d-flex flex-wrap gap-2">
+                                                                <% classes.slice(0, 6).forEach(cls=> { %>
+                                                                    <span class="badge bg-secondary">
+                                                                        <%= cls.class_name %>-<%= cls.section %>
+                                                                                (<%= cls.students ? cls.students.length
+                                                                                    : 0 %>)
+                                                                    </span>
+                                                                    <% }) %>
+                                                                        <% if (classes.length> 6) { %>
+                                                                            <span class="badge bg-secondary">+<%=
+                                                                                    classes.length - 6 %> more</span>
+                                                                            <% } %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <% } %>
+
+                                                        <form action="/admin/schools/<%= school._id %>/promote/all"
+                                                            method="POST"
+                                                            onsubmit="return confirm('⚠️ WARNING: This will promote ALL students in ALL classes! Are you absolutely sure you want to proceed? This action cannot be undone!');">
+                                                            <button type="submit" class="btn btn-warning w-100">
+                                                                <i class="bi bi-lightning-charge me-2"></i>Promote All
+                                                                Classes
+                                                            </button>
+                                                        </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Information Card -->
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="mb-3"><i class="bi bi-info-circle me-2"></i>Important Information
+                                        </h6>
+                                        <ul class="mb-0 text-muted">
+                                            <li>Student promotion moves students from one class to another</li>
+                                            <li>Make sure destination classes exist before promoting</li>
+                                            <li>Promoted students will maintain their roll numbers unless you manually
+                                                change them</li>
+                                            <li>Attendance history (total presents/absents) will be preserved</li>
+                                            <li>You can manually adjust student assignments after bulk promotion if
+                                                needed</li>
+                                        </ul>
+                                    </div>
+                                </div>
+            </div>
+    </div>
+
+    <script>
+        const fromClassSelect = document.getElementById('fromClass');
+        const toClassSelect = document.getElementById('toClass');
+        const promoteBtn = document.getElementById('promoteBtn');
+        const preview = document.getElementById('promotionPreview');
+        const previewText = document.getElementById('previewText');
+
+        function updatePreview() {
+            const fromClass = fromClassSelect.options[fromClassSelect.selectedIndex];
+            const toClass = toClassSelect.options[toClassSelect.selectedIndex];
+
+            if (fromClassSelect.value && toClassSelect.value) {
+                const studentCount = fromClass.getAttribute('data-students');
+                const fromText = fromClass.text.split('(')[0].trim();
+                const toText = toClass.text.split('(')[0].trim();
+
+                preview.classList.remove('d-none');
+                previewText.textContent = `${studentCount} student(s) will be moved from ${fromText} to ${toText}`;
+                promoteBtn.disabled = false;
+
+                // Warn if promoting to same class
+                if (fromClassSelect.value === toClassSelect.value) {
+                    preview.classList.remove('alert-info');
+                    preview.classList.add('alert-danger');
+                    previewText.textContent = 'Error: Cannot promote to the same class!';
+                    promoteBtn.disabled = true;
+                } else {
+                    preview.classList.remove('alert-danger');
+                    preview.classList.add('alert-info');
+                }
+            } else {
+                preview.classList.add('d-none');
+                promoteBtn.disabled = true;
+            }
+        }
+
+        fromClassSelect.addEventListener('change', updatePreview);
+        toClassSelect.addEventListener('change', updatePreview);
+    </script>
+
+    <%- include('../partials/footer') %>

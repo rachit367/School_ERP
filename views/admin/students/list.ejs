@@ -1,0 +1,257 @@
+<%- include('../partials/header') %>
+
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle: 'Students - ' + school.name }) %>
+
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools">Schools</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools/<%= school._id %>">
+                                <%= school.name %>
+                            </a></li>
+                        <li class="breadcrumb-item active">Students</li>
+                    </ol>
+                </nav>
+
+                <!-- Success/Error Messages -->
+                <% if (typeof success !=='undefined' && success) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <%= success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <% } %>
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <% } %>
+
+                                <!-- Header -->
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div>
+                                        <h2 class="mb-1"><i class="bi bi-people me-2 text-success"></i>All Students</h2>
+                                        <p class="text-muted mb-0">
+                                            <%= school.name %> - Total: <%= students ? students.length : 0 %> students
+                                        </p>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="/admin/schools/<%= school._id %>/bulk" class="btn btn-info">
+                                            <i class="bi bi-stack me-2"></i>Bulk Add
+                                        </a>
+                                        <a href="/admin/schools/<%= school._id %>/students/new" class="btn btn-success">
+                                            <i class="bi bi-plus-circle me-2"></i>Add Student
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Filter by Class -->
+                                <% if (classes && classes.length> 0) { %>
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-3">
+                                                    <label class="form-label mb-0"><strong>Filter by
+                                                            Class:</strong></label>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <a href="/admin/schools/<%= school._id %>/students"
+                                                            class="btn btn-sm <%= !selectedClassId ? 'btn-primary' : 'btn-outline-primary' %>">
+                                                            All Classes
+                                                        </a>
+                                                        <% classes.forEach(cls=> { %>
+                                                            <a href="/admin/schools/<%= school._id %>/students?class_id=<%= cls._id %>"
+                                                                class="btn btn-sm <%= selectedClassId && selectedClassId.toString() === cls._id.toString() ? 'btn-primary' : 'btn-outline-primary' %>">
+                                                                Class <%= cls.class_name %>-<%= cls.section %>
+                                                            </a>
+                                                            <% }) %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% } %>
+
+                                        <!-- Students Table -->
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <span><i class="bi bi-list me-2"></i>Student List</span>
+                                                <% if (students && students.length> 0) { %>
+                                                    <button type="button" class="btn btn-sm btn-danger"
+                                                        onclick="bulkDeleteStudents()">
+                                                        <i class="bi bi-trash me-1"></i>Delete Selected
+                                                    </button>
+                                                    <% } %>
+                                            </div>
+                                            <div class="card-body">
+                                                <% if (students && students.length> 0) { %>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-hover align-middle">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>
+                                                                        <input type="checkbox" id="selectAll"
+                                                                            class="form-check-input">
+                                                                    </th>
+                                                                    <th>#</th>
+                                                                    <th>Roll No</th>
+                                                                    <th>Name</th>
+                                                                    <th>Class</th>
+                                                                    <th>Phone</th>
+                                                                    <th>Father's Name</th>
+                                                                    <th>Attendance</th>
+                                                                    <th>Actions</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <% students.forEach((student, index)=> { %>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input type="checkbox"
+                                                                                class="form-check-input student-checkbox"
+                                                                                value="<%= student._id %>">
+                                                                        </td>
+                                                                        <td>
+                                                                            <%= index + 1 %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <% if (student.studentProfile &&
+                                                                                student.studentProfile.roll_number) { %>
+                                                                                <code><%= student.studentProfile.roll_number %></code>
+                                                                                <% } else { %>
+                                                                                    <span class="text-muted">-</span>
+                                                                                    <% } %>
+                                                                        </td>
+                                                                        <td><strong>
+                                                                                <%= student.name %>
+                                                                            </strong></td>
+                                                                        <td>
+                                                                            <% if (student.studentProfile &&
+                                                                                student.studentProfile.class_id) { %>
+                                                                                <span class="badge bg-primary">
+                                                                                    <%= student.studentProfile.class_id.class_name
+                                                                                        %>-<%=
+                                                                                            student.studentProfile.class_id.section
+                                                                                            %>
+                                                                                </span>
+                                                                                <% } else { %>
+                                                                                    <span class="text-warning">Not
+                                                                                        Assigned</span>
+                                                                                    <% } %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <%= student.phone %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <% if (student.studentProfile &&
+                                                                                student.studentProfile.father_name) { %>
+                                                                                <%= student.studentProfile.father_name
+                                                                                    %>
+                                                                                    <% } else { %>
+                                                                                        <span
+                                                                                            class="text-muted">-</span>
+                                                                                        <% } %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <% if (student.studentProfile) { %>
+                                                                                <span class="badge bg-success me-1">P:
+                                                                                    <%= student.studentProfile.total_presents
+                                                                                        || 0 %></span>
+                                                                                <span class="badge bg-danger">A: <%=
+                                                                                        student.studentProfile.total_absents
+                                                                                        || 0 %></span>
+                                                                                <% } else { %>
+                                                                                    <span class="text-muted">-</span>
+                                                                                    <% } %>
+                                                                        </td>
+                                                                        <td class="action-buttons">
+                                                                            <a href="/admin/schools/<%= school._id %>/students/<%= student._id %>/edit"
+                                                                                class="btn btn-outline-warning btn-sm"
+                                                                                title="Edit">
+                                                                                <i class="bi bi-pencil"></i>
+                                                                            </a>
+                                                                            <form
+                                                                                action="/admin/schools/<%= school._id %>/students/<%= student._id %>/delete"
+                                                                                method="POST" class="d-inline"
+                                                                                onsubmit="return confirm('Are you sure you want to delete <%= student.name %>?')">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-danger btn-sm"
+                                                                                    title="Delete">
+                                                                                    <i class="bi bi-trash"></i>
+                                                                                </button>
+                                                                            </form>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <% }) %>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <div class="empty-state">
+                                                            <i class="bi bi-people"></i>
+                                                            <h5>No Students Found</h5>
+                                                            <% if (selectedClassId) { %>
+                                                                <p>No students in the selected class.</p>
+                                                                <a href="/admin/schools/<%= school._id %>/students"
+                                                                    class="btn btn-outline-primary me-2">
+                                                                    View All Students
+                                                                </a>
+                                                                <% } else { %>
+                                                                    <p>Add students to this school to get started.</p>
+                                                                    <% } %>
+                                                                        <a href="/admin/schools/<%= school._id %>/students/new"
+                                                                            class="btn btn-success">
+                                                                            <i class="bi bi-plus-circle me-2"></i>Add
+                                                                            Student
+                                                                        </a>
+                                                        </div>
+                                                        <% } %>
+                                            </div>
+                                        </div>
+            </div>
+    </div>
+
+    <script>
+        // Select all checkbox functionality
+        document.getElementById('selectAll')?.addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        // Bulk delete functionality
+        function bulkDeleteStudents() {
+            const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked'))
+                .map(cb => cb.value);
+
+            if (selectedIds.length === 0) {
+                alert('Please select at least one student to delete');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete ${selectedIds.length} student(s)? This action cannot be undone!`)) {
+                return;
+            }
+
+            // Create form and submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/schools/<%= school._id %>/students/bulk-delete';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'studentIds';
+            input.value = JSON.stringify(selectedIds);
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+
+    <%- include('../partials/footer') %>

@@ -1,0 +1,173 @@
+<%- include('../partials/header') %>
+
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle: 'Classes - ' + school.name }) %>
+
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools">Schools</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools/<%= school._id %>">
+                                <%= school.name %>
+                            </a></li>
+                        <li class="breadcrumb-item active">Classes</li>
+                    </ol>
+                </nav>
+
+                <!-- Success/Error Messages -->
+                <% if (typeof success !=='undefined' && success) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <%= success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <% } %>
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <% } %>
+
+                                <!-- Header -->
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div>
+                                        <h2 class="mb-1"><i class="bi bi-book me-2 text-warning"></i>All Classes &
+                                            Sections</h2>
+                                        <p class="text-muted mb-0">
+                                            <%= school.name %> - Total: <%= classes ? classes.length : 0 %> classes
+                                        </p>
+                                    </div>
+                                    <a href="/admin/schools/<%= school._id %>/classes/new" class="btn btn-success">
+                                        <i class="bi bi-plus-circle me-2"></i>Add Class
+                                    </a>
+                                </div>
+
+                                <!-- Classes Grid -->
+                                <% if (classes && classes.length> 0) { %>
+                                    <div class="row g-4">
+                                        <% classes.forEach(cls=> { %>
+                                            <div class="col-xl-4 col-md-6">
+                                                <div class="card h-100 border-left-primary"
+                                                    style="border-left: 5px solid var(--warning);">
+                                                    <div class="card-body">
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-start mb-3">
+                                                            <div>
+                                                                <h4 class="mb-1">
+                                                                    <span class="badge bg-warning text-dark"
+                                                                        style="font-size: 1.1rem;">
+                                                                        Class <%= cls.class_name %>-<%= cls.section %>
+                                                                    </span>
+                                                                </h4>
+                                                                <% if (cls.class_teacher) { %>
+                                                                    <p class="text-muted mb-0"
+                                                                        style="font-size: 0.9rem;">
+                                                                        <i class="bi bi-person-circle me-1"></i>
+                                                                        <strong>Class Teacher:</strong>
+                                                                        <%= cls.class_teacher.name %>
+                                                                    </p>
+                                                                    <% } else { %>
+                                                                        <p class="text-warning mb-0"
+                                                                            style="font-size: 0.9rem;">
+                                                                            <i
+                                                                                class="bi bi-exclamation-circle me-1"></i>No
+                                                                            Class Teacher
+                                                                        </p>
+                                                                        <% } %>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row text-center mb-3">
+                                                            <div class="col-6">
+                                                                <div class="p-2 bg-success bg-opacity-10 rounded">
+                                                                    <h3 class="mb-0 text-success">
+                                                                        <%= cls.students ? cls.students.length : 0 %>
+                                                                    </h3>
+                                                                    <small class="text-muted">Students</small>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <div class="p-2 bg-info bg-opacity-10 rounded">
+                                                                    <h3 class="mb-0 text-info">
+                                                                        <%= cls.allowed_attendance_teachers ?
+                                                                            cls.allowed_attendance_teachers.length : 0
+                                                                            %>
+                                                                    </h3>
+                                                                    <small class="text-muted">Teachers</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Quick Info -->
+                                                        <div class="mb-3">
+                                                            <% if (cls.timetable && cls.timetable.url) { %>
+                                                                <p class="mb-1" style="font-size: 0.85rem;">
+                                                                    <i class="bi bi-table text-info me-1"></i>Timetable
+                                                                    uploaded
+                                                                </p>
+                                                                <% } %>
+                                                                    <% if (cls.syllabus && cls.syllabus.url) { %>
+                                                                        <p class="mb-1" style="font-size: 0.85rem;">
+                                                                            <i
+                                                                                class="bi bi-file-text text-success me-1"></i>Syllabus
+                                                                            uploaded
+                                                                        </p>
+                                                                        <% } %>
+                                                                            <% if (cls.exam && cls.exam.url) { %>
+                                                                                <p class="mb-1"
+                                                                                    style="font-size: 0.85rem;">
+                                                                                    <i
+                                                                                        class="bi bi-clipboard text-warning me-1"></i>Exam
+                                                                                    schedule available
+                                                                                </p>
+                                                                                <% } %>
+                                                        </div>
+
+                                                        <div class="d-flex gap-2">
+                                                            <a href="/admin/schools/<%= school._id %>/classes/<%= cls._id %>"
+                                                                class="btn btn-sm btn-primary flex-fill">
+                                                                <i class="bi bi-eye me-1"></i>View Students
+                                                            </a>
+                                                            <a href="/admin/schools/<%= school._id %>/classes/<%= cls._id %>/edit"
+                                                                class="btn btn-sm btn-outline-warning">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </a>
+                                                            <form
+                                                                action="/admin/schools/<%= school._id %>/classes/<%= cls._id %>/delete"
+                                                                method="POST" class="d-inline"
+                                                                onsubmit="return confirm('Are you sure you want to delete Class <%= cls.class_name %>-<%= cls.section %>? This will unassign all students!');">
+                                                                <button type="submit"
+                                                                    class="btn btn-sm btn-outline-danger">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                    </div>
+                                    <% } else { %>
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="empty-state">
+                                                    <i class="bi bi-book"></i>
+                                                    <h5>No Classes Found</h5>
+                                                    <p>Create classes and sections for this school to organize students.
+                                                    </p>
+                                                    <a href="/admin/schools/<%= school._id %>/classes/new"
+                                                        class="btn btn-success">
+                                                        <i class="bi bi-plus-circle me-2"></i>Create First Class
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% } %>
+            </div>
+    </div>
+
+    <%- include('../partials/footer') %>

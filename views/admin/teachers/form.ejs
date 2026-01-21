@@ -1,0 +1,109 @@
+<%- include('../partials/header', { currentPage: 'schools' }) %>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/admin/schools">Schools</a></li>
+        <li class="breadcrumb-item"><a href="/admin/schools/<%= school._id %>"><%= school.name %></a></li>
+        <li class="breadcrumb-item"><a href="/admin/schools/<%= school._id %>/teachers">Teachers</a></li>
+        <li class="breadcrumb-item active"><%= isEdit ? 'Edit Teacher' : 'New Teacher' %></li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-person-badge me-2"></i>
+                <%= isEdit ? 'Edit Teacher' : 'Add New Teacher' %>
+            </div>
+            <div class="card-body">
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-circle me-2"></i><%= error %>
+                    </div>
+                <% } %>
+                
+                <form method="POST" action="<%= isEdit ? '/admin/schools/' + school._id + '/teachers/' + teacher._id : '/admin/schools/' + school._id + '/teachers' %>">
+                    <h6 class="border-bottom pb-2 mb-3">Personal Information</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="<%= teacher ? teacher.name : '' %>" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="phone" name="phone" 
+                                   value="<%= teacher ? teacher.phone : '' %>" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="<%= teacher ? teacher.email : '' %>">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="date_of_birth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
+                                   value="<%= teacher && teacher.date_of_birth ? new Date(teacher.date_of_birth).toISOString().split('T')[0] : '' %>">
+                        </div>
+                    </div>
+                    
+                    <h6 class="border-bottom pb-2 mb-3 mt-4">Professional Information</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="employee_id" class="form-label">Employee ID</label>
+                            <input type="text" class="form-control" id="employee_id" name="employee_id" 
+                                   value="<%= teacher && teacher.teacherProfile ? teacher.teacherProfile.employee_id : '' %>">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="designation" class="form-label">Designation</label>
+                            <select class="form-select" id="designation" name="designation">
+                                <option value="">-- Select --</option>
+                                <option value="ST" <%= (teacher && teacher.teacherProfile && teacher.teacherProfile.designation === 'ST') ? 'selected' : '' %>>Subject Teacher (ST)</option>
+                                <option value="Mentor" <%= (teacher && teacher.teacherProfile && teacher.teacherProfile.designation === 'Mentor') ? 'selected' : '' %>>Mentor</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="class_teacher_of" class="form-label">Class Teacher Of</label>
+                            <select class="form-select" id="class_teacher_of" name="class_teacher_of">
+                                <option value="">-- None --</option>
+                                <% classes.forEach(cls => { %>
+                                    <option value="<%= cls._id %>" 
+                                        <%= (teacher && teacher.teacherProfile && teacher.teacherProfile.class_teacher_of && teacher.teacherProfile.class_teacher_of.toString() === cls._id.toString()) ? 'selected' : '' %>>
+                                        Class <%= cls.class_name %>-<%= cls.section %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="subjects" class="form-label">Subjects (comma separated)</label>
+                            <input type="text" class="form-control" id="subjects" name="subjects" 
+                                   placeholder="Mathematics, Physics, Chemistry"
+                                   value="<%= teacher && teacher.teacherProfile && teacher.teacherProfile.subjects ? teacher.teacherProfile.subjects.join(', ') : '' %>">
+                            <small class="text-muted">Enter subjects separated by commas</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>
+                            <%= isEdit ? 'Update Teacher' : 'Add Teacher' %>
+                        </button>
+                        <a href="/admin/schools/<%= school._id %>/teachers" class="btn btn-secondary">
+                            <i class="bi bi-x-lg me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

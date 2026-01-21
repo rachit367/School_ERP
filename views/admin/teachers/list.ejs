@@ -1,0 +1,244 @@
+<%- include('../partials/header') %>
+
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle: 'Teachers - ' + school.name }) %>
+
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools">Schools</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools/<%= school._id %>">
+                                <%= school.name %>
+                            </a></li>
+                        <li class="breadcrumb-item active">Teachers</li>
+                    </ol>
+                </nav>
+
+                <!-- Success/Error Messages -->
+                <% if (typeof success !=='undefined' && success) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <%= success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <% } %>
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <% } %>
+
+                                <!-- Header -->
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div>
+                                        <h2 class="mb-1"><i class="bi bi-person-badge me-2 text-info"></i>All Teachers
+                                        </h2>
+                                        <p class="text-muted mb-0">
+                                            <%= school.name %> - Total: <%= teachers ? teachers.length : 0 %> teachers
+                                        </p>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="/admin/schools/<%= school._id %>/bulk" class="btn btn-info">
+                                            <i class="bi bi-stack me-2"></i>Bulk Add
+                                        </a>
+                                        <a href="/admin/schools/<%= school._id %>/teachers/new" class="btn btn-success">
+                                            <i class="bi bi-plus-circle me-2"></i>Add Teacher
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Teachers Table -->
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-list me-2"></i>Teacher List</span>
+                                        <% if (teachers && teachers.length> 0) { %>
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                onclick="bulkDeleteTeachers()">
+                                                <i class="bi bi-trash me-1"></i>Delete Selected
+                                            </button>
+                                            <% } %>
+                                    </div>
+                                    <div class="card-body">
+                                        <% if (teachers && teachers.length> 0) { %>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover align-middle">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>
+                                                                <input type="checkbox" id="selectAll"
+                                                                    class="form-check-input">
+                                                            </th>
+                                                            <th>#</th>
+                                                            <th>Name</th>
+                                                            <th>Employee ID</th>
+                                                            <th>Phone</th>
+                                                            <th>Designation</th>
+                                                            <th>Subjects</th>
+                                                            <th>Class Teacher</th>
+                                                            <th>Classes Assigned</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% teachers.forEach((teacher, index)=> { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input teacher-checkbox"
+                                                                        value="<%= teacher._id %>">
+                                                                </td>
+                                                                <td>
+                                                                    <%= index + 1 %>
+                                                                </td>
+                                                                <td><strong>
+                                                                        <%= teacher.name %>
+                                                                    </strong></td>
+                                                                <td>
+                                                                    <% if (teacher.teacherProfile &&
+                                                                        teacher.teacherProfile.employee_id) { %>
+                                                                        <code><%= teacher.teacherProfile.employee_id %></code>
+                                                                        <% } else { %>
+                                                                            <span class="text-muted">-</span>
+                                                                            <% } %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= teacher.phone %>
+                                                                </td>
+                                                                <td>
+                                                                    <% if (teacher.teacherProfile &&
+                                                                        teacher.teacherProfile.designation) { %>
+                                                                        <span class="badge bg-info">
+                                                                            <%= teacher.teacherProfile.designation %>
+                                                                        </span>
+                                                                        <% } else { %>
+                                                                            <span class="text-muted">-</span>
+                                                                            <% } %>
+                                                                </td>
+                                                                <td>
+                                                                    <% if (teacher.teacherProfile &&
+                                                                        teacher.teacherProfile.subjects &&
+                                                                        teacher.teacherProfile.subjects.length> 0) { %>
+                                                                        <% teacher.teacherProfile.subjects.slice(0,
+                                                                            2).forEach(subject=> { %>
+                                                                            <span class="badge bg-secondary me-1">
+                                                                                <%= subject %>
+                                                                            </span>
+                                                                            <% }) %>
+                                                                                <% if
+                                                                                    (teacher.teacherProfile.subjects.length>
+                                                                                    2) { %>
+                                                                                    <span class="badge bg-secondary">+
+                                                                                        <%= teacher.teacherProfile.subjects.length
+                                                                                            - 2 %></span>
+                                                                                    <% } %>
+                                                                                        <% } else { %>
+                                                                                            <span
+                                                                                                class="text-muted">-</span>
+                                                                                            <% } %>
+                                                                </td>
+                                                                <td>
+                                                                    <% if (teacher.teacherProfile &&
+                                                                        teacher.teacherProfile.class_teacher_of) { %>
+                                                                        <span class="badge bg-success">
+                                                                            <%= teacher.teacherProfile.class_teacher_of.class_name
+                                                                                %>-<%=
+                                                                                    teacher.teacherProfile.class_teacher_of.section
+                                                                                    %>
+                                                                        </span>
+                                                                        <% } else { %>
+                                                                            <span class="text-muted">-</span>
+                                                                            <% } %>
+                                                                </td>
+                                                                <td>
+                                                                    <% if (teacher.teacherProfile &&
+                                                                        teacher.teacherProfile.classes_assigned &&
+                                                                        teacher.teacherProfile.classes_assigned.length>
+                                                                        0) { %>
+                                                                        <span class="badge bg-primary">
+                                                                            <%= teacher.teacherProfile.classes_assigned.length
+                                                                                %> classes
+                                                                        </span>
+                                                                        <% } else { %>
+                                                                            <span class="text-muted">-</span>
+                                                                            <% } %>
+                                                                </td>
+                                                                <td class="action-buttons">
+                                                                    <a href="/admin/schools/<%= school._id %>/teachers/<%= teacher._id %>/edit"
+                                                                        class="btn btn-outline-warning btn-sm"
+                                                                        title="Edit">
+                                                                        <i class="bi bi-pencil"></i>
+                                                                    </a>
+                                                                    <form
+                                                                        action="/admin/schools/<%= school._id %>/teachers/<%= teacher._id %>/delete"
+                                                                        method="POST" class="d-inline"
+                                                                        onsubmit="return confirm('Are you sure you want to delete <%= teacher.name %>?')">
+                                                                        <button type="submit"
+                                                                            class="btn btn-outline-danger btn-sm"
+                                                                            title="Delete">
+                                                                            <i class="bi bi-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </td>
+                                                            </tr>
+                                                            <% }) %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <% } else { %>
+                                                <div class="empty-state">
+                                                    <i class="bi bi-person-badge"></i>
+                                                    <h5>No Teachers Found</h5>
+                                                    <p>Add teachers to this school to get started.</p>
+                                                    <a href="/admin/schools/<%= school._id %>/teachers/new"
+                                                        class="btn btn-success">
+                                                        <i class="bi bi-plus-circle me-2"></i>Add Teacher
+                                                    </a>
+                                                </div>
+                                                <% } %>
+                                    </div>
+                                </div>
+            </div>
+    </div>
+
+    <script>
+        // Select all checkbox functionality
+        document.getElementById('selectAll')?.addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('.teacher-checkbox');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        // Bulk delete functionality
+        function bulkDeleteTeachers() {
+            const selectedIds = Array.from(document.querySelectorAll('.teacher-checkbox:checked'))
+                .map(cb => cb.value);
+
+            if (selectedIds.length === 0) {
+                alert('Please select at least one teacher to delete');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete ${selectedIds.length} teacher(s)? This action cannot be undone!`)) {
+                return;
+            }
+
+            // Create form and submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/schools/<%= school._id %>/teachers/bulk-delete';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'teacherIds';
+            input.value = JSON.stringify(selectedIds);
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+
+    <%- include('../partials/footer') %>

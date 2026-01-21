@@ -1,10 +1,13 @@
-require("dotenv").config()
+require("dotenv").config({ path: require('path').join(__dirname, '.env') })
 const cors=require('cors')
+const path=require('path')
+const cookieParser=require('cookie-parser')
+const expressLayouts = require('express-ejs-layouts')
 const {connectDB}=require('./config/db')
 const express=require('express')
 const app=express()
 
-const allowedOrigins=process.env.ALLOWED_ORIGINS.split(',')
+const allowedOrigins=process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000']
 
 const errorHandling=require('./middlewares/errorHandling')
 const authRouter=require('./routes/authRouter')
@@ -18,8 +21,23 @@ const timetableRouter=require('./routes/timetableRouter')
 const leaveRouter=require('./routes/leaveRouter')
 const doubtRouter=require('./routes/doubtRouter')
 const studentRouter=require('./routes/studentRouter')
+const adminRouter=require('./routes/adminRouter')
 
-connectDB()
+// Initialize Admin Service to create default admin
+const adminService = require('./services/adminService')
+
+connectDB().then(() => {
+    // Create default super admin if not exists
+    adminService.createDefaultAdmin().catch(console.error)
+})
+
+// Set up EJS as view engine for Admin Panel
+app.set('view engine', 'ejs')
+app.set('views', path.join(__dirname, 'views'))
+app.use(expressLayouts)
+app.set('layout', 'admin/layout')
+app.set('layout extractScripts', true)
+app.set('layout extractStyles', true)
 
 app.use(cors({
   origin: function(origin, callback) {
@@ -33,11 +51,22 @@ app.use(cors({
 }));
 //app.use(cors({origin:allowedOrigins}))  //DEPLOYMENT
 
+// Cookie parser for admin sessions
+app.use(cookieParser())
+
+// Serve static files (CSS, JS, images)
+app.use(express.static(path.join(__dirname, 'public')))
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
+// ==================== ADMIN PANEL ROUTES (EJS) ====================
+app.use('/admin', adminRouter)
 
+// ==================== API ROUTES ====================
 app.use('/api/auth',authRouter)
+
+
 
 app.use('/api/principal',principalUserRouter)
 app.use('/api/teacher',teacherRouter)

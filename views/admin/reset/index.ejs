@@ -1,0 +1,353 @@
+<%- include('../partials/header') %>
+
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle: 'Hard Reset System' }) %>
+
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Hard Reset</li>
+                    </ol>
+                </nav>
+
+                <!-- Success/Error Messages -->
+                <% if (typeof success !=='undefined' && success) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <%= success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <% } %>
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <% } %>
+
+                                <!-- Danger Warning -->
+                                <div class="alert alert-danger border-danger mb-4" style="border-width: 2px;">
+                                    <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>⚠️
+                                        DANGER ZONE - HARD RESET</h4>
+                                    <p class="mb-0">This section allows you to perform destructive operations on the
+                                        database. Use with extreme caution! All deletions are permanent and cannot be
+                                        undone.</p>
+                                </div>
+
+                                <!-- Header -->
+                                <div class="mb-4">
+                                    <h2 class="mb-1 text-danger"><i class="bi bi-radioactive me-2"></i>System Hard Reset
+                                    </h2>
+                                    <p class="text-muted mb-0">Clean up and reset academic year data</p>
+                                </div>
+
+                                <!-- School Selection -->
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="bi bi-building me-2"></i>Select Scope
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <label class="form-label"><strong>Reset Scope:</strong></label>
+                                                <select id="schoolSelect" class="form-select">
+                                                    <option value="">All Schools (System-Wide)</option>
+                                                    <% if (schools && schools.length> 0) { %>
+                                                        <% schools.forEach(school=> { %>
+                                                            <option value="<%= school._id %>">
+                                                                <%= school.name %>
+                                                            </option>
+                                                            <% }) %>
+                                                                <% } %>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="alert alert-info mb-0 mt-3 mt-md-0">
+                                                    <small><strong>Note:</strong> Select a specific school or reset all
+                                                        schools at once</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Reset Options -->
+                                <div class="row">
+                                    <!-- Clear Attendance Records -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card border-warning h-100">
+                                            <div class="card-header bg-warning bg-opacity-25">
+                                                <i class="bi bi-calendar-x me-2"></i>Clear Attendance Records
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="text-muted">Removes all attendance records and resets student
+                                                    attendance counters</p>
+                                                <ul class="text-muted mb-3" style="font-size: 0.9rem;">
+                                                    <li>Deletes all daily attendance entries</li>
+                                                    <li>Resets total_presents and total_absents to 0</li>
+                                                    <li>Students and classes remain intact</li>
+                                                </ul>
+                                                <button type="button" class="btn btn-warning w-100"
+                                                    onclick="performReset('attendance')">
+                                                    <i class="bi bi-trash me-2"></i>Clear Attendance
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Clear Homework -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card border-warning h-100">
+                                            <div class="card-header bg-warning bg-opacity-25">
+                                                <i class="bi bi-journal-x me-2"></i>Clear Homework & Assignments
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="text-muted">Removes all homework and assignment records</p>
+                                                <ul class="text-muted mb-3" style="font-size: 0.9rem;">
+                                                    <li>Deletes all homework entries</li>
+                                                    <li>Removes submission records</li>
+                                                    <li>Classes and students remain intact</li>
+                                                </ul>
+                                                <button type="button" class="btn btn-warning w-100"
+                                                    onclick="performReset('homework')">
+                                                    <i class="bi bi-trash me-2"></i>Clear Homework
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Clear Exams & Marks -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card border-warning h-100">
+                                            <div class="card-header bg-warning bg-opacity-25">
+                                                <i class="bi bi-clipboard-x me-2"></i>Clear Exams & Marks
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="text-muted">Removes all exam schedules and student marks</p>
+                                                <ul class="text-muted mb-3" style="font-size: 0.9rem;">
+                                                    <li>Deletes all exam entries</li>
+                                                    <li>Removes all marks/grades</li>
+                                                    <li>Student records remain intact</li>
+                                                </ul>
+                                                <button type="button" class="btn btn-warning w-100"
+                                                    onclick="performReset('exams')">
+                                                    <i class="bi bi-trash me-2"></i>Clear Exams & Marks
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Clear Announcements -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card border-warning h-100">
+                                            <div class="card-header bg-warning bg-opacity-25">
+                                                <i class="bi bi-megaphone-fill me-2"></i>Clear Announcements
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="text-muted">Removes all announcements from the system</p>
+                                                <ul class="text-muted mb-3" style="font-size: 0.9rem;">
+                                                    <li>Deletes all announcement records</li>
+                                                    <li>Users and classes remain intact</li>
+                                                </ul>
+                                                <button type="button" class="btn btn-warning w-100"
+                                                    onclick="performReset('announcements')">
+                                                    <i class="bi bi-trash me-2"></i>Clear Announcements
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Clear Leaves -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card border-warning h-100">
+                                            <div class="card-header bg-warning bg-opacity-25">
+                                                <i class="bi bi-envelope-x me-2"></i>Clear Leave Applications
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="text-muted">Removes all leave application records</p>
+                                                <ul class="text-muted mb-3" style="font-size: 0.9rem;">
+                                                    <li>Deletes all leave requests</li>
+                                                    <li>Users remain intact</li>
+                                                </ul>
+                                                <button type="button" class="btn btn-warning w-100"
+                                                    onclick="performReset('leaves')">
+                                                    <i class="bi bi-trash me-2"></i>Clear Leaves
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Clear Doubts -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card border-warning h-100">
+                                            <div class="card-header bg-warning bg-opacity-25">
+                                                <i class="bi bi-question-circle me-2"></i>Clear Doubt Portal
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="text-muted">Removes all doubt/question records</p>
+                                                <ul class="text-muted mb-3" style="font-size: 0.9rem;">
+                                                    <li>Deletes all doubt entries</li>
+                                                    <li>Removes responses and solutions</li>
+                                                </ul>
+                                                <button type="button" class="btn btn-warning w-100"
+                                                    onclick="performReset('doubts')">
+                                                    <i class="bi bi-trash me-2"></i>Clear Doubts
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Full Academic Year Reset -->
+                                <div class="card border-danger mb-4" style="border-width: 3px;">
+                                    <div class="card-header bg-danger text-white">
+                                        <h5 class="mb-0"><i class="bi bi-radioactive me-2"></i>FULL ACADEMIC YEAR RESET
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-danger">
+                                            <h6 class="alert-heading"><strong>⚠️ EXTREME CAUTION REQUIRED!</strong></h6>
+                                            <p class="mb-2">This will delete ALL academic data including:</p>
+                                            <ul class="mb-0">
+                                                <li>All attendance records</li>
+                                                <li>All homework and assignments</li>
+                                                <li>All exam records and marks</li>
+                                                <li>All announcements</li>
+                                                <li>All leave applications</li>
+                                                <li>All doubt portal entries</li>
+                                                <li>All timetable entries</li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="alert alert-success">
+                                            <p class="mb-0"><strong>✓ What will be preserved:</strong> Schools, Classes,
+                                                Students, Teachers, and their basic profiles</p>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label"><strong>Type "RESET" to
+                                                        confirm:</strong></label>
+                                                <input type="text" id="confirmText" class="form-control"
+                                                    placeholder="Type RESET here">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">&nbsp;</label>
+                                                <button type="button" class="btn btn-danger w-100"
+                                                    onclick="performFullReset()" id="fullResetBtn" disabled>
+                                                    <i class="bi bi-radioactive me-2"></i>EXECUTE FULL RESET
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Information -->
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="mb-3"><i class="bi bi-info-circle me-2"></i>Important Information
+                                        </h6>
+                                        <ul class="mb-0 text-muted" style="font-size: 0.9rem;">
+                                            <li>All reset operations are <strong>permanent and cannot be undone</strong>
+                                            </li>
+                                            <li>It's recommended to backup your database before performing any reset
+                                            </li>
+                                            <li>Partial resets only affect specific data types (e.g., only attendance)
+                                            </li>
+                                            <li>Full academic year reset preserves structural data (schools, users,
+                                                classes)</li>
+                                            <li>After reset, you can start fresh for a new academic year</li>
+                                            <li>Student attendance counters will be reset to zero</li>
+                                        </ul>
+                                    </div>
+                                </div>
+            </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Reset</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage"></p>
+                    <p class="text-danger mb-0"><strong>This action cannot be undone!</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="/admin/reset" method="POST" id="resetForm">
+                        <input type="hidden" name="schoolId" id="resetSchoolId">
+                        <input type="hidden" name="resetType" id="resetType">
+                        <button type="submit" class="btn btn-danger">Confirm Reset</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        const schoolSelect = document.getElementById('schoolSelect');
+        const confirmText = document.getElementById('confirmText');
+        const fullResetBtn = document.getElementById('fullResetBtn');
+
+        // Enable full reset button only when "RESET" is typed
+        confirmText.addEventListener('input', function () {
+            fullResetBtn.disabled = this.value.toUpperCase() !== 'RESET';
+        });
+
+        function performReset(resetType) {
+            const schoolId = schoolSelect.value;
+            const schoolName = schoolId ? schoolSelect.options[schoolSelect.selectedIndex].text : 'All Schools';
+
+            let message = '';
+            switch (resetType) {
+                case 'attendance':
+                    message = `Clear all attendance records for ${schoolName}?`;
+                    break;
+                case 'homework':
+                    message = `Clear all homework and assignments for ${schoolName}?`;
+                    break;
+                case 'exams':
+                    message = `Clear all exams and marks for ${schoolName}?`;
+                    break;
+                case 'announcements':
+                    message = `Clear all announcements for ${schoolName}?`;
+                    break;
+                case 'leaves':
+                    message = `Clear all leave applications for ${schoolName}?`;
+                    break;
+                case 'doubts':
+                    message = `Clear all doubt portal entries for ${schoolName}?`;
+                    break;
+            }
+
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('resetSchoolId').value = schoolId;
+            document.getElementById('resetType').value = resetType;
+            confirmModal.show();
+        }
+
+        function performFullReset() {
+            const schoolId = schoolSelect.value;
+            const schoolName = schoolId ? schoolSelect.options[schoolSelect.selectedIndex].text : 'All Schools';
+
+            if (confirmText.value.toUpperCase() !== 'RESET') {
+                alert('Please type RESET to confirm');
+                return;
+            }
+
+            document.getElementById('confirmMessage').textContent = `Perform FULL ACADEMIC YEAR RESET for ${schoolName}? This will delete ALL academic data!`;
+            document.getElementById('resetSchoolId').value = schoolId;
+            document.getElementById('resetType').value = 'full';
+            confirmModal.show();
+        }
+    </script>
+
+    <%- include('../partials/footer') %>

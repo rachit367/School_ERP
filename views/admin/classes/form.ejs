@@ -1,0 +1,74 @@
+<%- include('../partials/header', { currentPage: 'schools' }) %>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/admin/schools">Schools</a></li>
+        <li class="breadcrumb-item"><a href="/admin/schools/<%= school._id %>"><%= school.name %></a></li>
+        <li class="breadcrumb-item"><a href="/admin/schools/<%= school._id %>/classes">Classes</a></li>
+        <li class="breadcrumb-item active"><%= isEdit ? 'Edit Class' : 'New Class' %></li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-journal-text me-2"></i>
+                <%= isEdit ? 'Edit Class' : 'Create New Class' %>
+            </div>
+            <div class="card-body">
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-circle me-2"></i><%= error %>
+                    </div>
+                <% } %>
+                
+                <form method="POST" action="<%= isEdit ? '/admin/schools/' + school._id + '/classes/' + classData._id : '/admin/schools/' + school._id + '/classes' %>">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="class_name" class="form-label">Class Number <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="class_name" name="class_name" 
+                                   value="<%= classData ? classData.class_name : '' %>" required min="1" max="12">
+                            <small class="text-muted">Enter class number (1-12)</small>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="section" class="form-label">Section <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="section" name="section" 
+                                   value="<%= classData ? classData.section : '' %>" required placeholder="A, B, C...">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="class_teacher" class="form-label">Class Teacher</label>
+                        <select class="form-select" id="class_teacher" name="class_teacher">
+                            <option value="">-- Select Teacher --</option>
+                            <% teachers.forEach(teacher => { %>
+                                <option value="<%= teacher._id %>" 
+                                    <%= (classData && classData.class_teacher && classData.class_teacher._id && classData.class_teacher._id.toString() === teacher._id.toString()) ? 'selected' : '' %>>
+                                    <%= teacher.name %> 
+                                    <% if (teacher.teacherProfile?.employee_id) { %>
+                                        (<%= teacher.teacherProfile.employee_id %>)
+                                    <% } %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>
+                            <%= isEdit ? 'Update Class' : 'Create Class' %>
+                        </button>
+                        <a href="/admin/schools/<%= school._id %>/classes" class="btn btn-secondary">
+                            <i class="bi bi-x-lg me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

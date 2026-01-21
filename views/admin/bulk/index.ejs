@@ -1,0 +1,256 @@
+<%- include('../partials/header') %>
+
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle: 'Bulk Operations - ' + school.name }) %>
+
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools">Schools</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/schools/<%= school._id %>">
+                                <%= school.name %>
+                            </a></li>
+                        <li class="breadcrumb-item active">Bulk Operations</li>
+                    </ol>
+                </nav>
+
+                <!-- Success/Error Messages -->
+                <% if (typeof success !=='undefined' && success) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <%= success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <% } %>
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <% } %>
+
+                                <!-- Header -->
+                                <div class="mb-4">
+                                    <h2 class="mb-1"><i class="bi bi-stack me-2 text-primary"></i>Bulk Operations</h2>
+                                    <p class="text-muted mb-0">Bulk add students and teachers to <%= school.name %>
+                                    </p>
+                                </div>
+
+                                <!-- Tabs -->
+                                <ul class="nav nav-tabs mb-4" id="bulkTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="students-tab" data-bs-toggle="tab"
+                                            data-bs-target="#students" type="button" role="tab">
+                                            <i class="bi bi-people me-2"></i>Bulk Add Students
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="teachers-tab" data-bs-toggle="tab"
+                                            data-bs-target="#teachers" type="button" role="tab">
+                                            <i class="bi bi-person-badge me-2"></i>Bulk Add Teachers
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content" id="bulkTabContent">
+                                    <!-- Bulk Add Students -->
+                                    <div class="tab-pane fade show active" id="students" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <i class="bi bi-upload me-2"></i>Add Multiple Students
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <form action="/admin/schools/<%= school._id %>/bulk/students"
+                                                            method="POST" id="bulkStudentForm">
+                                                            <div class="mb-3">
+                                                                <label for="studentClass"
+                                                                    class="form-label"><strong>Select
+                                                                        Class</strong></label>
+                                                                <select name="class_id" id="studentClass"
+                                                                    class="form-select" required>
+                                                                    <option value="">-- Select Class --</option>
+                                                                    <% if (classes && classes.length> 0) { %>
+                                                                        <% classes.forEach(cls=> { %>
+                                                                            <option value="<%= cls._id %>">Class <%=
+                                                                                    cls.class_name %>-<%= cls.section %>
+                                                                            </option>
+                                                                            <% }) %>
+                                                                                <% } %>
+                                                                </select>
+                                                                <div class="form-text">Select the class where students
+                                                                    will be added</div>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label for="studentData"
+                                                                    class="form-label"><strong>Student Data (JSON
+                                                                        Format)</strong></label>
+                                                                <textarea name="students" id="studentData"
+                                                                    class="form-control" rows="12" required
+                                                                    placeholder='Paste JSON array here...'></textarea>
+                                                                <div class="form-text">Paste your student data in JSON
+                                                                    format (see example on right)</div>
+                                                            </div>
+
+                                                            <div class="d-flex gap-2">
+                                                                <button type="submit" class="btn btn-success">
+                                                                    <i class="bi bi-upload me-2"></i>Bulk Add Students
+                                                                </button>
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    onclick="document.getElementById('studentData').value = ''">
+                                                                    <i class="bi bi-x-circle me-2"></i>Clear
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-header">
+                                                        <i class="bi bi-info-circle me-2"></i>Format Example
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <p class="mb-2"><strong>JSON Format:</strong></p>
+                                                        <pre class="bg-dark text-light p-3 rounded"
+                                                            style="font-size: 0.85rem; overflow-x: auto;"><code>[
+  {
+    "name": "John Doe",
+    "phone": 9876543210,
+    "email": "john@example.com",
+    "date_of_birth": "2010-05-15",
+    "roll_number": "001",
+    "father_name": "Michael Doe",
+    "father_number": 9876543211,
+    "mother_name": "Jane Doe",
+    "mother_number": 9876543212
+  },
+  {
+    "name": "Jane Smith",
+    "phone": 9876543213,
+    "roll_number": "002",
+    "father_name": "Bob Smith"
+  }
+]</code></pre>
+                                                        <div class="alert alert-info mt-3">
+                                                            <small>
+                                                                <strong>Required fields:</strong> name, phone<br>
+                                                                <strong>Optional fields:</strong> email, date_of_birth,
+                                                                roll_number, parent details
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bulk Add Teachers -->
+                                    <div class="tab-pane fade" id="teachers" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <i class="bi bi-upload me-2"></i>Add Multiple Teachers
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <form action="/admin/schools/<%= school._id %>/bulk/teachers"
+                                                            method="POST" id="bulkTeacherForm">
+                                                            <div class="mb-3">
+                                                                <label for="teacherData"
+                                                                    class="form-label"><strong>Teacher Data (JSON
+                                                                        Format)</strong></label>
+                                                                <textarea name="teachers" id="teacherData"
+                                                                    class="form-control" rows="12" required
+                                                                    placeholder='Paste JSON array here...'></textarea>
+                                                                <div class="form-text">Paste your teacher data in JSON
+                                                                    format (see example on right)</div>
+                                                            </div>
+
+                                                            <div class="d-flex gap-2">
+                                                                <button type="submit" class="btn btn-success">
+                                                                    <i class="bi bi-upload me-2"></i>Bulk Add Teachers
+                                                                </button>
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    onclick="document.getElementById('teacherData').value = ''">
+                                                                    <i class="bi bi-x-circle me-2"></i>Clear
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-header">
+                                                        <i class="bi bi-info-circle me-2"></i>Format Example
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <p class="mb-2"><strong>JSON Format:</strong></p>
+                                                        <pre class="bg-dark text-light p-3 rounded"
+                                                            style="font-size: 0.85rem; overflow-x: auto;"><code>[
+  {
+    "name": "Prof. Smith",
+    "phone": 9876543210,
+    "email": "smith@school.com",
+    "date_of_birth": "1985-03-20",
+    "employee_id": "EMP001",
+    "designation": "ST",
+    "subjects": ["Math", "Science"]
+  },
+  {
+    "name": "Dr. Johnson",
+    "phone": 9876543214,
+    "email": "johnson@school.com",
+    "employee_id": "EMP002",
+    "designation": "Mentor",
+    "subjects": ["English"]
+  }
+]</code></pre>
+                                                        <div class="alert alert-info mt-3">
+                                                            <small>
+                                                                <strong>Required fields:</strong> name, phone<br>
+                                                                <strong>Optional fields:</strong> email, date_of_birth,
+                                                                employee_id, designation (ST/Mentor), subjects array
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+            </div>
+    </div>
+
+    <script>
+        // Validate JSON before submit
+        document.getElementById('bulkStudentForm').addEventListener('submit', function (e) {
+            const data = document.getElementById('studentData').value;
+            try {
+                JSON.parse(data);
+            } catch (error) {
+                e.preventDefault();
+                alert('Invalid JSON format! Please check your data.\n\nError: ' + error.message);
+            }
+        });
+
+        document.getElementById('bulkTeacherForm').addEventListener('submit', function (e) {
+            const data = document.getElementById('teacherData').value;
+            try {
+                JSON.parse(data);
+            } catch (error) {
+                e.preventDefault();
+                alert('Invalid JSON format! Please check your data.\n\nError: ' + error.message);
+            }
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

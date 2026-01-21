@@ -1,0 +1,66 @@
+<%- include('../partials/header') %>
+
+<div class="main-content">
+    <%- include('../partials/topbar', { pageTitle: school ? 'Edit School' : 'Add New School' }) %>
+    
+    <div class="content-wrapper">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-building me-2"></i><%= school ? 'Edit School' : 'Create New School' %></h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="<%= school ? `/admin/schools/${school._id}` : '/admin/schools' %>">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">School Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" value="<%= school ? school.name : '' %>" required placeholder="Enter school name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="schoolCode" class="form-label">School Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="schoolCode" name="schoolCode" value="<%= school ? school.schoolCode : '' %>" required placeholder="e.g., SCH001">
+                                <small class="form-text text-muted">Unique identifier for the school</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <textarea class="form-control" id="address" name="address" rows="3"><%= school ? school.address : '' %></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="contactNumber" class="form-label">Contact Number</label>
+                                    <input type="tel" class="form-control" id="contactNumber" name="contactNumber" value="<%= school ? school.contactNumber : '' %>">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="<%= school ? school.email : '' %>">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="board" class="form-label">Board/Affiliation</label>
+                                <select class="form-select" id="board" name="board">
+                                    <option value="">Select Board</option>
+                                    <option value="CBSE">CBSE</option>
+                                    <option value="ICSE">ICSE</option>
+                                    <option value="State Board">State Board</option>
+                                    <option value="IB">IB</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="isActive" name="isActive" <%= school ? (school.isActive ? 'checked' : '') : 'checked' %>>
+                                    <label class="form-check-label" for="isActive">School is Active</label>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-2"></i><%= school ? 'Update School' : 'Create School' %></button>
+                                <a href="/admin/schools" class="btn btn-secondary"><i class="bi bi-x-circle me-2"></i>Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

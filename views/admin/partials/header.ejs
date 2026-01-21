@@ -1,0 +1,76 @@
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <!-- Brand -->
+    <a href="/admin/dashboard" class="sidebar-brand">
+        <img src="/images/logo.png" alt="Gyanama" class="sidebar-logo"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+        <i class="bi bi-mortarboard-fill" style="display: none;"></i>
+        <span>Gyanama Admin</span>
+    </a>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="/admin/dashboard"
+                    class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <div class="sidebar-divider"></div>
+
+            <div class="sidebar-heading">Management</div>
+
+            <li class="nav-item">
+                <a href="/admin/schools"
+                    class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'schools' ? 'active' : '' %>">
+                    <i class="bi bi-building"></i>
+                    <span>Schools</span>
+                </a>
+            </li>
+
+            <div class="sidebar-divider"></div>
+
+            <div class="sidebar-heading">System</div>
+
+            <li class="nav-item">
+                <a href="/admin/reset"
+                    class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'reset' ? 'active' : '' %>">
+                    <i class="bi bi-radioactive"></i>
+                    <span>Hard Reset</span>
+                </a>
+            </li>
+
+            <div class="sidebar-divider"></div>
+
+            <li class="nav-item">
+                <a href="/admin/logout" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+
+<script>
+    // Sidebar toggle for mobile
+    document.getElementById('sidebarToggle')?.addEventListener('click', function () {
+        document.getElementById('sidebar')?.classList.toggle('show');
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function (e) {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        if (sidebar && sidebarToggle &&
+            !sidebar.contains(e.target) &&
+            !sidebarToggle.contains(e.target) &&
+            sidebar.classList.contains('show')) {
+            sidebar.classList.remove('show');
+        }
+    });
+</script>
