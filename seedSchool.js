@@ -7,7 +7,7 @@ const School = require("./models/schoolModel")
 const User = require("./models/userModel")
 const Class = require("./models/classModel")
 
-const MONGO_URI = "mongodb://127.0.0.1:27017/schoolDB" // change if needed
+const MONGO_URI = process.env.MONGO_URI // change if needed
 
 async function connectDB(){
   await mongoose.connect(MONGO_URI)

@@ -2,10 +2,10 @@ const jwt = require('jsonwebtoken');
 const Admin = require('../models/adminModel');
 
 // Middleware to check if admin is authenticated
-const isAdminAuthenticated = async (req, res, next) => {
+async function isAdminAuthenticated(req, res, next) {
     try {
         const token = req.cookies?.adminToken || req.session?.adminToken;
-        
+
         if (!token) {
             return res.redirect('/admin/login');
         }
@@ -13,7 +13,7 @@ const isAdminAuthenticated = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'admin-secret-key');
         const admin = await Admin.findById(decoded.id);
 
-        if (!admin || !admin.isActive) {
+        if (!admin) {
             res.clearCookie('adminToken');
             return res.redirect('/admin/login');
         }
@@ -25,18 +25,18 @@ const isAdminAuthenticated = async (req, res, next) => {
         res.clearCookie('adminToken');
         return res.redirect('/admin/login');
     }
-};
+}
 
 // Middleware to check if already logged in
-const isAdminLoggedIn = async (req, res, next) => {
+async function isAdminLoggedIn(req, res, next) {
     try {
         const token = req.cookies?.adminToken || req.session?.adminToken;
-        
+
         if (token) {
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'admin-secret-key');
             const admin = await Admin.findById(decoded.id);
-            
-            if (admin && admin.isActive) {
+
+            if (admin) {
                 return res.redirect('/admin/dashboard');
             }
         }
@@ -44,16 +44,16 @@ const isAdminLoggedIn = async (req, res, next) => {
     } catch (error) {
         next();
     }
-};
+}
 
 // Generate admin JWT token
-const generateAdminToken = (adminId) => {
+function generateAdminToken(adminId) {
     return jwt.sign(
         { id: adminId },
         process.env.JWT_SECRET || 'admin-secret-key',
         { expiresIn: '24h' }
     );
-};
+}
 
 module.exports = {
     isAdminAuthenticated,
