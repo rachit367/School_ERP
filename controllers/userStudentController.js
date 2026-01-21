@@ -30,7 +30,7 @@ async function getSections(req, res, next) {
 
         const data = await handleGetSections(class_name, school_id);
 
-        return res.status(200).json({data});
+        return res.status(200).json(data);
     } catch (err) {
         next(err);
     }

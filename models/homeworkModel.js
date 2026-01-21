@@ -20,5 +20,6 @@ const homeworkSchema = new mongoose.Schema({
 
 homeworkSchema.index({school_id:1,class_id:1})
 homeworkSchema.index({school_id:1,created_by:1})
+homeworkSchema.index({school_id:1, created_by:1, deadline:1})
 
 module.exports = mongoose.model('Homework', homeworkSchema)

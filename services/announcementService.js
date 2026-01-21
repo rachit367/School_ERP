@@ -5,9 +5,7 @@ const getClassId=require('./../utils/classIdUtil')
 
 //req:   //res: [{_id, message, title, createdAt}]
 async function handleGetSchoolAnnouncements(school_id){
-    const user=await userModel.findById(user_id)
-    if (user.role === 'Student') return [];
-    const announcements=await announcementModel.find({school_id:user.school_id})
+    const announcements=await announcementModel.find({school_id})
     .select("message title createdAt _id")
     .sort({createdAt:-1})
     return announcements
@@ -92,17 +90,19 @@ async function handleDeleteAnnouncement(_id,user_id) {
 //req:teacher_id  //res:success
 async function handleAssignTeacher(id) {
     await userModel.findByIdAndUpdate(
-  id,
-  { $set: { 'teacherProfile.announcement_allowed': true } }
-);
+        id,
+        { $set: { 'teacherProfile.announcement_allowed': true } }
+    );
+    return {success:true}
 }
 
 //req:teacher_id  //res:success
 async function handleRemoveTeacher(id) {
     await userModel.findByIdAndUpdate(
-  id,
-  { $set: { 'teacherProfile.announcement_allowed': false } }
-);
+    id,
+    { $set: { 'teacherProfile.announcement_allowed': false } }
+    );
+    return {success:true}
 }
 
 module.exports={handleCreateAnnouncement,handleDeleteAnnouncement,handleGetAnnouncements,handleGetClassAnnouncements,handleGetSchoolAnnouncements,handleRemoveTeacher,handleAssignTeacher}

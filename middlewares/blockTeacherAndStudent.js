@@ -1,4 +1,4 @@
-const userModel = require('../models/userModel');
+
 
 async function blockTeacherAndStudent(req, res, next) {
   try {

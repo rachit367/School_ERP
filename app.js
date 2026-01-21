@@ -39,8 +39,6 @@ app.use(express.urlencoded({extended:true}));
 
 app.use('/api/auth',authRouter)
 
-
-
 app.use('/api/principal',principalUserRouter)
 app.use('/api/teacher',teacherRouter)
 app.use('/api/student',studentRouter)

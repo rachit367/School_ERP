@@ -41,8 +41,8 @@ async function handleGetSubjectDoubts(teacher_id,student_id,school_id) {
         _id:s._id,
         subject:s.subject,
         doubt:s.doubt,
-        reply:s.reply.text,
-        replied_at:s.reply.replied_at,
+        reply:s.reply?.text ?? '',
+        replied_at:s.reply?.replied_at ?? '',
         status:s.status
     }))
     return payload
@@ -50,15 +50,17 @@ async function handleGetSubjectDoubts(teacher_id,student_id,school_id) {
 
 //req:class_id,teacher_id,subject,doubt  //res:success
 async function handlePostDoubt(school_id,student_id,class_id,teacher_id,subject,doubt) {
-    const doubt=await doubtModel.create({
+    async function handlePostDoubt(school_id,student_id,class_id,teacher_id,subject,doubt) {
+    await doubtModel.create({
         school_id,
         class_id,
         subject,
         student:student_id,
         teacher:teacher_id,
-        doubt
+        doubt: doubt  
     })
     return {success:true}
+}
 }
 
 //req:doubt_id //res:teacher_name,doubt,reply,replied_at
@@ -69,11 +71,16 @@ async function handleGetDoubtDetails(school_id,student_id,doubt_id) {
         school_id
     }).populate({path:'teacher',select:'name'})
     .lean()
+
+    if (!doubt) {
+        return null 
+    }
+    
     const payload={
         teacher:doubt.teacher.name,
         doubt:doubt.doubt,
-        reply:doubt.reply.text,
-        replied_at:doubt.reply.replied_at
+        reply:doubt.reply?.text ?? '',
+        replied_at:doubt.reply?.replied_at ?? ''
     }
     return payload
 }

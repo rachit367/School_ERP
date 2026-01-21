@@ -33,6 +33,11 @@ async function handleGetHomeworkDetails(homework_id){
     .populate({path:'submitted_by.student_id',select:'name'})
     .select('_id class_id topic description deadline submitted_by')
     .lean()
+    if (!hw) {
+    const err = new Error('Homework not found');
+    err.statusCode = 404;
+    throw err;
+}
     const payload={
         id:hw._id,
         topic:hw.topic,
@@ -92,35 +97,81 @@ async function handleGetClassHomework(class_id,user_id) {
 }
 
 //req:class_id,teacher_id  //res:{completed,pending,submitted}-each is an array of {_id,topic,description,attachments,deadline}
-async function handleGetSubjectHomeworks(school_id,class_id,teacher_id,student_id) {
-    const homeworks=await homeworkModel.find({school_id,class_id:class_id,created_by:teacher_id})
-    .lean();
+async function handleGetSubjectHomeworks(school_id, class_id, teacher_id, student_id) {
+    const mongoose = require('mongoose');
+    const studentObjectId = mongoose.Types.ObjectId(student_id);
 
-    let completed = []
-    let submitted = []
-    let pending = []
-
-    for(let hw of homeworks){
-        const submission = hw.submitted_by?.find(s => s.student_id.toString() === student_id.toString())
-        delete hw.submitted_by;
-        delete hw.school_id;
-        delete hw.class_id;
-        delete hw.created_by
-        if (!submission) {
-            // Not submitted
-            pending.push(hw)
-        } 
-        else {
-            //Submitted
-            if (hw.deadline && submission.submitted_at <= hw.deadline) {
-                completed.push(hw) // on time
-            } else {
-                submitted.push(hw) // late
+    const categorized = await homeworkModel.aggregate([
+        // Match base criteria
+        {
+            $match: {
+                school_id: mongoose.Types.ObjectId(school_id),
+                class_id: mongoose.Types.ObjectId(class_id),
+                created_by: mongoose.Types.ObjectId(teacher_id)
+            }
+        },
+        // Filter submissions for this specific student
+        {
+            $addFields: {
+                studentSubmission: {
+                    $filter: {
+                        input: { $ifNull: ["$submitted_by", []] },
+                        as: "sub",
+                        cond: { $eq: ["$$sub.student_id", studentObjectId] }
+                    }
+                }
+            }
+        },
+        // Determine if student has submitted
+        {
+            $addFields: {
+                hasSubmission: { $gt: [{ $size: "$studentSubmission" }, 0] },
+                submissionData: { $arrayElemAt: ["$studentSubmission", 0] }
+            }
+        },
+        // Categorize homework
+        {
+            $addFields: {
+                category: {
+                    $cond: {
+                        if: "$hasSubmission",
+                        then: {
+                            $cond: {
+                                if: { $lte: ["$submissionData.submitted_at", "$deadline"] },
+                                then: "completed",  // submitted on time
+                                else: "submitted"   // submitted late
+                            }
+                        },
+                        else: "pending"  // not submitted
+                    }
+                }
+            }
+        },
+        // Remove unnecessary fields
+        {
+            $project: {
+                submitted_by: 0,
+                school_id: 0,
+                class_id: 0,
+                created_by: 0,
+                studentSubmission: 0,
+                hasSubmission: 0,
+                submissionData: 0
             }
         }
-        
-    }
-    return {completed,pending,submitted}
+    ]);
+
+    // Group results by category
+    const completed = categorized.filter(hw => hw.category === "completed");
+    const submitted = categorized.filter(hw => hw.category === "submitted");
+    const pending = categorized.filter(hw => hw.category === "pending");
+
+    // Remove category field from final results
+    completed.forEach(hw => delete hw.category);
+    submitted.forEach(hw => delete hw.category);
+    pending.forEach(hw => delete hw.category);
+
+    return { completed, pending, submitted }
 }
 
 //req:class_id,homework_id  //res:topic,description,deadline,_id

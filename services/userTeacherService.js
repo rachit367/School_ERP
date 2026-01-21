@@ -88,7 +88,8 @@ async function handleGetTeacher(teacher_id) {
 
 //req:teacher_id //res:{success}
 async function handleDeleteTeacher(teacher_id,school_id) {
-    //Remove teacher from all classes
+    async function handleDeleteTeacher(teacher_id, school_id) {
+    // 1. Remove teacher from all classes
     await classModel.updateMany(
         {
             $or: [
@@ -105,12 +106,39 @@ async function handleDeleteTeacher(teacher_id,school_id) {
             }
         }
     );
-    await userModel.deleteOne({ _id: teacher_id, role: 'Teacher' });
-    await schoolModel.findByIdAndUpdate(
-        school_id,
-        { $inc: { total_teachers: -1 } }
+
+    // 2. Delete or reassign homeworks
+    await homeworkModel.deleteMany({ created_by: teacher_id });
+
+    // 3. Delete or reassign doubts
+    await doubtModel.updateMany(
+        { assigned_to: teacher_id },
+        { $set: { assigned_to: null, status: 'unassigned' } }
     );
+
+    // 4. Delete announcements
+    await announcementModel.deleteMany({ created_by: teacher_id });
+
+    // 5. Delete exams created
+    await examModel.deleteMany({ created_by: teacher_id });
+
+    // 6. Remove from timetable
+    await timetableModel.updateMany(
+        { "periods.teacher_id": teacher_id },
+        { $set: { "periods.$[elem].teacher_id": null } },
+        { arrayFilters: [{ "elem.teacher_id": teacher_id }] }
+    );
+
+    // 7. Update school count
+    await schoolModel.findByIdAndUpdate(school_id, {
+        $inc: { total_teachers: -1 }
+    });
+
+    // 8. Finally delete the user
+    await userModel.deleteOne({ _id: teacher_id, role: 'Teacher' });
+
     return { success: true };
+}
 }
 
 //req:name,email,role,employee_id,class_teacher_of,classes_assigned,subjects  //res:{success,message}

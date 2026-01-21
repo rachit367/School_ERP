@@ -162,21 +162,43 @@ async function handleAddStudent(school_id,name,class_name,section,dob,roll_numbe
 
 //req:student_id  //res:success
 async function handleDeleteStudent(student_id){
+    async function handleDeleteStudent(student_id){
     const user = await userModel.findOne({ _id: student_id, role: 'Student' });
     if (!user) throw new Error("Student not found");
-
+    // 1. Remove from school count
     await schoolModel.findByIdAndUpdate(user.school_id,{
         $inc:{total_students:-1}
-    })
-
-    await userModel.deleteOne({ _id: student_id });
-    //  Remove student from class.students array
-    await attendanceModel.deleteMany({ student_id });
+    });
+    // 2. Remove from class
     await classModel.updateOne(
         { students: student_id },
         { $pull: { students: student_id } }
     );
+    // 3. Delete attendance records
+    await attendanceModel.deleteMany({ student_id });
+    // 4. Remove homework submissions
+    await homeworkModel.updateMany(
+        { "submitted_by.student_id": student_id },
+        { $pull: { submitted_by: { student_id } } }
+    );
+    // 5. Delete marks/exam records
+    await marksModel.deleteMany({ student_id });
+    // 6. Delete fee records (or mark as inactive)
+    await feesModel.deleteMany({ student_id });
+    // 7. Delete doubts posted by student
+    await doubtModel.deleteMany({ student_id });
+    // 8. Delete leave applications
+    await leaveModel.deleteMany({ student_id });
+    // 9. Delete PTM records
+    await ptmModel.deleteMany({ student_id });
+    // 10. Delete bully reports
+    await bullyModel.deleteMany({ 
+        $or: [{ reporter_id: student_id }, { accused_id: student_id }]
+    });
+    // 11. Finally delete the user
+    await userModel.deleteOne({ _id: student_id });
     return { success: true };
+}
 }
 
 async function handleTransferStudent(student_id,section){

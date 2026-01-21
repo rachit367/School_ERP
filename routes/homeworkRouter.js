@@ -33,7 +33,7 @@ router.post('/',isTeacher,postHomework)
 //req:class_id,teacher_id  //res:{completed,pending,submitted}-each is an array of {_id,topic,description,attachments,deadline}
 router.get('/student',getSubjectHomeworks)
 
-router.get('/student/:id',getStudentHomeworkDetails)
+router.get('/student/:homeworkid',getStudentHomeworkDetails)
 
 //req:homework_id  //res:success
 router.post('/submit',submitHomework)
