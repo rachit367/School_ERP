@@ -41,7 +41,7 @@ app.set('layout extractStyles', true)
 
 
 app.use(cors({
-  origin:'*'
+  origin: '*'
 }));
 
 
