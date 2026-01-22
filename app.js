@@ -39,8 +39,7 @@ app.set('layout', 'admin/layout')
 app.set('layout extractScripts', true)
 app.set('layout extractStyles', true)
 
-// CORS Configuration for Multi-Platform Access
-// Supports: Flutter mobile apps, Postman testing, and server-side rendering
+
 app.use(cors({
   origin:'*'
 }));

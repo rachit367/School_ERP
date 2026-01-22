@@ -20,12 +20,14 @@ const {
     updateClass,
     deleteClass,
     showTeachers,
+    showAllTeachers,
     showCreateTeacher,
     createTeacher,
     showEditTeacher,
     updateTeacher,
     deleteTeacher,
     showStudents,
+    showAllStudents,
     showCreateStudent,
     createStudent,
     showEditStudent,
@@ -33,6 +35,9 @@ const {
     deleteStudent,
     showCreatePrincipal,
     createPrincipal,
+    showEditPrincipal,
+    updatePrincipal,
+    deletePrincipal,
     showBulkOperations,
     bulkCreateStudents,
     bulkCreateTeachers,
@@ -62,6 +67,10 @@ router.get('/dashboard', showDashboard);
 
 // Search API
 router.get('/api/search', search);
+
+// ==================== GLOBAL LISTS ROUTES ====================
+router.get('/students', showAllStudents);
+router.get('/teachers', showAllTeachers);
 
 // ==================== SCHOOL ROUTES ====================
 router.get('/schools', showSchools);
@@ -102,6 +111,9 @@ router.post('/schools/:schoolId/students/bulk-delete', bulkDeleteStudents);
 // ==================== PRINCIPAL ROUTES ====================
 router.get('/schools/:schoolId/principal/new', showCreatePrincipal);
 router.post('/schools/:schoolId/principal', createPrincipal);
+router.get('/schools/:schoolId/principal/:principalId/edit', showEditPrincipal);
+router.post('/schools/:schoolId/principal/:principalId', updatePrincipal);
+router.post('/schools/:schoolId/principal/:principalId/delete', deletePrincipal);
 
 // ==================== BULK OPERATIONS ROUTES ====================
 router.get('/schools/:schoolId/bulk', showBulkOperations);

@@ -1,0 +1,105 @@
+<%- include('../partials/header') %>
+
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle: 'All Teachers' }) %>
+
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item active">All Teachers</li>
+                    </ol>
+                </nav>
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 class="mb-1" style="font-size: 1.25rem; font-weight: 600;">All Teachers</h2>
+                        <p class="text-muted mb-0" style="font-size: 0.875rem;">
+                            <%= teachers ? teachers.length : 0 %> teachers across all schools
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Teachers Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="bi bi-person-badge me-2"></i>Teacher Directory</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <% if (teachers && teachers.length> 0) { %>
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>School</th>
+                                            <th>Designation</th>
+                                            <th>Phone</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% teachers.forEach((teacher, index)=> { %>
+                                            <tr>
+                                                <td class="text-muted">
+                                                    <%= index + 1 %>
+                                                </td>
+                                                <td><strong>
+                                                        <%= teacher.name %>
+                                                    </strong></td>
+                                                <td>
+                                                    <% if (teacher.school_id) { %>
+                                                        <a href="/admin/schools/<%= teacher.school_id._id %>"
+                                                            class="text-decoration-none">
+                                                            <span class="badge bg-primary">
+                                                                <%= teacher.school_id.name %>
+                                                            </span>
+                                                        </a>
+                                                        <% } else { %>
+                                                            <span class="text-muted">—</span>
+                                                            <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (teacher.teacherProfile && teacher.teacherProfile.designation)
+                                                        { %>
+                                                        <span class="badge bg-info">
+                                                            <%= teacher.teacherProfile.designation %>
+                                                        </span>
+                                                        <% } else { %>
+                                                            <span class="text-muted">—</span>
+                                                            <% } %>
+                                                </td>
+                                                <td>
+                                                    <%= teacher.phone %>
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <% if (teacher.school_id) { %>
+                                                            <a href="/admin/schools/<%= teacher.school_id._id %>/teachers/<%= teacher._id %>/edit"
+                                                                class="btn btn-outline-warning btn-sm" title="Edit">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </a>
+                                                            <% } %>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <% } else { %>
+                                <div class="empty-state">
+                                    <i class="bi bi-person-badge"></i>
+                                    <h5>No Teachers Found</h5>
+                                    <p>There are no teachers in the system yet.</p>
+                                </div>
+                                <% } %>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <%- include('../partials/footer') %>

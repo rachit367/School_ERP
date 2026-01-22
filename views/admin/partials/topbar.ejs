@@ -1,58 +1,17 @@
 <!-- Topbar -->
-<div class="topbar">
+<header class="topbar">
     <div class="topbar-left">
-        <button class="btn btn-link d-lg-none" id="sidebarToggle">
-            <i class="bi bi-list fs-4"></i>
+        <button class="btn btn-link d-lg-none p-0" id="sidebarToggle">
+            <i class="bi bi-list fs-4 text-muted"></i>
         </button>
         <h1 class="topbar-title">
             <%= typeof pageTitle !=='undefined' ? pageTitle : 'Dashboard' %>
         </h1>
     </div>
     <div class="topbar-right">
-        <a href="/admin/logout" class="btn btn-danger">
-            <i class="bi bi-box-arrow-left me-2"></i>Logout
+        <a href="/admin/logout" class="btn btn-secondary btn-sm">
+            <i class="bi bi-box-arrow-right"></i>
+            <span class="d-none d-md-inline">Logout</span>
         </a>
     </div>
-</div>
-
-<style>
-    .topbar-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .topbar .btn-light {
-        background: #f3f4f6;
-        border: none;
-        border-radius: 10px;
-        padding: 0.5rem 0.75rem;
-    }
-
-    .topbar .btn-light:hover {
-        background: #e5e7eb;
-    }
-
-    .dropdown-menu {
-        border: none;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        border-radius: 12px;
-        padding: 0.5rem;
-    }
-
-    .dropdown-item {
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-    }
-
-    .dropdown-item:hover {
-        background: #f3f4f6;
-    }
-</style>
+</header>

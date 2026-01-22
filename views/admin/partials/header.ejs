@@ -5,7 +5,7 @@
         <img src="/images/logo.png" alt="Gyanama" class="sidebar-logo"
             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
         <i class="bi bi-mortarboard-fill" style="display: none;"></i>
-        <span>Gyanama Admin</span>
+        <span>Gyanama</span>
     </a>
 
     <!-- Navigation -->
@@ -14,13 +14,12 @@
             <li class="nav-item">
                 <a href="/admin/dashboard"
                     class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
-                    <i class="bi bi-speedometer2"></i>
+                    <i class="bi bi-grid-1x2"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
 
             <div class="sidebar-divider"></div>
-
             <div class="sidebar-heading">Management</div>
 
             <li class="nav-item">
@@ -31,24 +30,30 @@
                 </a>
             </li>
 
-            <div class="sidebar-divider"></div>
+            <li class="nav-item">
+                <a href="/admin/students"
+                    class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'all-students' ? 'active' : '' %>">
+                    <i class="bi bi-people"></i>
+                    <span>All Students</span>
+                </a>
+            </li>
 
+            <li class="nav-item">
+                <a href="/admin/teachers"
+                    class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'all-teachers' ? 'active' : '' %>">
+                    <i class="bi bi-person-badge"></i>
+                    <span>All Teachers</span>
+                </a>
+            </li>
+
+            <div class="sidebar-divider"></div>
             <div class="sidebar-heading">System</div>
 
             <li class="nav-item">
                 <a href="/admin/reset"
                     class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'reset' ? 'active' : '' %>">
-                    <i class="bi bi-radioactive"></i>
+                    <i class="bi bi-arrow-repeat"></i>
                     <span>Hard Reset</span>
-                </a>
-            </li>
-
-            <div class="sidebar-divider"></div>
-
-            <li class="nav-item">
-                <a href="/admin/logout" class="nav-link text-danger">
-                    <i class="bi bi-box-arrow-left"></i>
-                    <span>Logout</span>
                 </a>
             </li>
         </ul>

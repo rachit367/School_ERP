@@ -286,6 +286,22 @@ async function handleGetTeachersBySchool(schoolId) {
     return await User.find({ school_id: schoolId, role: 'Teacher' }).lean();
 }
 
+async function handleGetAllTeachersGlobal() {
+    return await User.find({ role: 'Teacher' })
+        .populate('school_id', 'name')
+        .populate('teacherProfile.class_teacher_of', 'class_name section')
+        .sort({ name: 1 })
+        .lean();
+}
+
+async function handleGetAllStudentsGlobal() {
+    return await User.find({ role: 'Student' })
+        .populate('school_id', 'name')
+        .populate('studentProfile.class_id', 'class_name section')
+        .sort({ name: 1 })
+        .lean();
+}
+
 // ==================== STUDENT SERVICES ====================
 
 async function handleGetStudentById(studentId) {
@@ -814,6 +830,8 @@ module.exports = {
     handleUpdateTeacher,
     handleDeleteTeacher,
     handleGetTeachersBySchool,
+    handleGetAllTeachersGlobal,
+    handleGetAllStudentsGlobal,
     handleGetStudentById,
     handleCreateStudent,
     handleUpdateStudent,

@@ -1,0 +1,106 @@
+<%- include('../partials/header') %>
+
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle: 'All Students' }) %>
+
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item active">All Students</li>
+                    </ol>
+                </nav>
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 class="mb-1" style="font-size: 1.25rem; font-weight: 600;">All Students</h2>
+                        <p class="text-muted mb-0" style="font-size: 0.875rem;">
+                            <%= students ? students.length : 0 %> students across all schools
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Students Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="bi bi-people me-2"></i>Student Directory</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <% if (students && students.length> 0) { %>
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>School</th>
+                                            <th>Class</th>
+                                            <th>Phone</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% students.forEach((student, index)=> { %>
+                                            <tr>
+                                                <td class="text-muted">
+                                                    <%= index + 1 %>
+                                                </td>
+                                                <td><strong>
+                                                        <%= student.name %>
+                                                    </strong></td>
+                                                <td>
+                                                    <% if (student.school_id) { %>
+                                                        <a href="/admin/schools/<%= student.school_id._id %>"
+                                                            class="text-decoration-none">
+                                                            <span class="badge bg-primary">
+                                                                <%= student.school_id.name %>
+                                                            </span>
+                                                        </a>
+                                                        <% } else { %>
+                                                            <span class="text-muted">—</span>
+                                                            <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (student.studentProfile && student.studentProfile.class_id) {
+                                                        %>
+                                                        <span class="badge bg-info">
+                                                            <%= student.studentProfile.class_id.class_name %>-<%=
+                                                                    student.studentProfile.class_id.section %>
+                                                        </span>
+                                                        <% } else { %>
+                                                            <span class="text-muted">Not Assigned</span>
+                                                            <% } %>
+                                                </td>
+                                                <td>
+                                                    <%= student.phone %>
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <% if (student.school_id) { %>
+                                                            <a href="/admin/schools/<%= student.school_id._id %>/students/<%= student._id %>/edit"
+                                                                class="btn btn-outline-warning btn-sm" title="Edit">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </a>
+                                                            <% } %>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <% } else { %>
+                                <div class="empty-state">
+                                    <i class="bi bi-people"></i>
+                                    <h5>No Students Found</h5>
+                                    <p>There are no students in the system yet.</p>
+                                </div>
+                                <% } %>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <%- include('../partials/footer') %>

@@ -18,6 +18,8 @@ const {
     handleUpdateTeacher,
     handleDeleteTeacher,
     handleGetTeachersBySchool,
+    handleGetAllTeachersGlobal,
+    handleGetAllStudentsGlobal,
     handleGetStudentById,
     handleCreateStudent,
     handleUpdateStudent,
@@ -25,6 +27,8 @@ const {
     handleGetStudentsBySchool,
     handleGetStudentsByClass,
     handleCreatePrincipal,
+    handleUpdatePrincipal,
+    handleDeletePrincipal,
     handleBulkCreateStudents,
     handleBulkCreateTeachers,
     handleBulkDeleteStudents,
@@ -142,13 +146,26 @@ async function showCreateSchool(req, res) {
 
 async function createSchool(req, res, next) {
     try {
-        const { name, address } = req.body;
-        await handleCreateSchool({ name, address });
-        res.redirect('/admin/schools?success=School created successfully');
+        const { name, address, principal_name, principal_phone, principal_email } = req.body;
+
+        // Create the school first
+        const school = await handleCreateSchool({ name, address });
+
+        // Create the principal and link to school
+        if (principal_name && principal_phone) {
+            await handleCreatePrincipal({
+                name: principal_name,
+                phone: parseInt(principal_phone),
+                email: principal_email || undefined,
+                school_id: school._id
+            });
+        }
+
+        res.redirect('/admin/schools?success=School and Principal created successfully');
     } catch (error) {
         res.render('admin/schools/form', {
             title: 'Create School',
-            school: req.body,
+            school: null,
             isEdit: false,
             error: error.message
         });
@@ -597,6 +614,56 @@ async function createPrincipal(req, res, next) {
     }
 }
 
+async function showEditPrincipal(req, res, next) {
+    try {
+        const { schoolId, principalId } = req.params;
+        const school = await handleGetSchoolById(schoolId);
+        const User = require('../models/userModel');
+        const principal = await User.findOne({ _id: principalId, role: 'Principal' }).lean();
+
+        if (!principal) {
+            return res.redirect(`/admin/schools/${schoolId}?error=Principal not found`);
+        }
+
+        res.render('admin/principals/form', {
+            title: 'Edit Principal',
+            school,
+            principal,
+            isEdit: true
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function updatePrincipal(req, res, next) {
+    try {
+        const { schoolId, principalId } = req.params;
+        const { name, phone, email, date_of_birth } = req.body;
+
+        await handleUpdatePrincipal(principalId, {
+            name,
+            phone: parseInt(phone),
+            email,
+            date_of_birth: date_of_birth ? new Date(date_of_birth) : undefined
+        });
+
+        res.redirect(`/admin/schools/${schoolId}?success=Principal updated successfully`);
+    } catch (error) {
+        res.redirect(`/admin/schools/${req.params.schoolId}?error=${error.message}`);
+    }
+}
+
+async function deletePrincipal(req, res, next) {
+    try {
+        const { schoolId, principalId } = req.params;
+        await handleDeletePrincipal(principalId);
+        res.redirect(`/admin/schools/${schoolId}?success=Principal removed successfully`);
+    } catch (error) {
+        res.redirect(`/admin/schools/${req.params.schoolId}?error=${error.message}`);
+    }
+}
+
 // ==================== BULK OPERATIONS CONTROLLERS ====================
 
 async function showBulkOperations(req, res, next) {
@@ -788,6 +855,34 @@ async function search(req, res, next) {
     }
 }
 
+// ==================== GLOBAL LISTS CONTROLLERS ====================
+
+async function showAllStudents(req, res, next) {
+    try {
+        const students = await handleGetAllStudentsGlobal();
+        res.render('admin/students/all', {
+            title: 'All Students',
+            currentPage: 'all-students',
+            students
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function showAllTeachers(req, res, next) {
+    try {
+        const teachers = await handleGetAllTeachersGlobal();
+        res.render('admin/teachers/all', {
+            title: 'All Teachers',
+            currentPage: 'all-teachers',
+            teachers
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     showLoginPage,
     login,
@@ -808,12 +903,14 @@ module.exports = {
     updateClass,
     deleteClass,
     showTeachers,
+    showAllTeachers,
     showCreateTeacher,
     createTeacher,
     showEditTeacher,
     updateTeacher,
     deleteTeacher,
     showStudents,
+    showAllStudents,
     showCreateStudent,
     createStudent,
     showEditStudent,
@@ -821,6 +918,9 @@ module.exports = {
     deleteStudent,
     showCreatePrincipal,
     createPrincipal,
+    showEditPrincipal,
+    updatePrincipal,
+    deletePrincipal,
     showBulkOperations,
     bulkCreateStudents,
     bulkCreateTeachers,
