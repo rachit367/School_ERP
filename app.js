@@ -39,19 +39,36 @@ app.set('layout', 'admin/layout')
 app.set('layout extractScripts', true)
 app.set('layout extractStyles', true)
 
+// CORS Configuration for Multi-Platform Access
+// Supports: Flutter mobile apps, Postman testing, and server-side rendering
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
+    // Allow requests with no origin (mobile apps, Postman, server-side rendering)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    // If ALLOWED_ORIGINS is set and not empty, restrict to those origins
+    // Otherwise, allow all origins (required for Flutter mobile apps)
+    if (allowedOrigins.length > 0 && allowedOrigins[0] !== '') {
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
     } else {
-      callback(new Error("Not allowed by CORS"));
+      // Allow all origins when ALLOWED_ORIGINS is not set (default for mobile apps)
+      callback(null, true);
     }
   },
-  credentials: true
+  credentials: true, 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], 
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], 
+  exposedHeaders: ['Content-Range', 'X-Content-Range'], 
+  maxAge: 86400 
 }));
-//app.use(cors({origin:allowedOrigins}))  //DEPLOYMENT
 
-// Cookie parser for admin sessions
+
 app.use(cookieParser())
 
 // Serve static files (CSS, JS, images)
