@@ -36,9 +36,27 @@ const {
     handlePromoteStudents,
     handlePromoteAllClasses,
     handleHardResetAcademicYear,
-    handleSearchUsers
+    handleSearchUsers,
+    // Coordinator services
+    handleGetCoordinatorsBySchool,
+    handleGetCoordinatorById,
+    handleCreateCoordinator,
+    handleUpdateCoordinator,
+    handleDeleteCoordinator,
+    // Manager services
+    handleGetManagersBySchool,
+    handleGetManagerById,
+    handleCreateManager,
+    handleUpdateManager,
+    handleDeleteManager,
+    // Staff services
+    handleGetAllStaffBySchool,
+    // Detail view services
+    handleGetTeacherDetails,
+    handleGetStudentDetails
 } = require('../services/adminService');
 const { generateAdminToken } = require('../middlewares/adminAuth');
+
 
 // ==================== AUTH CONTROLLERS ====================
 
@@ -883,6 +901,240 @@ async function showAllTeachers(req, res, next) {
     }
 }
 
+// ==================== COORDINATOR CONTROLLERS ====================
+
+async function showStaff(req, res, next) {
+    try {
+        const { schoolId } = req.params;
+        const school = await handleGetSchoolById(schoolId);
+        const staff = await handleGetAllStaffBySchool(schoolId);
+
+        res.render('admin/staff/list', {
+            title: 'School Staff',
+            school,
+            ...staff,
+            success: req.query.success,
+            error: req.query.error
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function showCreateCoordinator(req, res, next) {
+    try {
+        const { schoolId } = req.params;
+        const school = await handleGetSchoolById(schoolId);
+
+        res.render('admin/staff/form', {
+            title: 'Add Coordinator',
+            school,
+            staff: null,
+            staffRole: 'Coordinator',
+            isEdit: false
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function createCoordinator(req, res, next) {
+    try {
+        const { schoolId } = req.params;
+        const { name, phone, email, date_of_birth } = req.body;
+
+        await handleCreateCoordinator({
+            name,
+            phone: parseInt(phone),
+            email,
+            date_of_birth: date_of_birth ? new Date(date_of_birth) : undefined,
+            school_id: schoolId
+        });
+
+        res.redirect(`/admin/schools/${schoolId}/staff?success=Coordinator added successfully`);
+    } catch (error) {
+        res.redirect(`/admin/schools/${req.params.schoolId}/staff?error=${error.message}`);
+    }
+}
+
+async function showEditCoordinator(req, res, next) {
+    try {
+        const { schoolId, coordinatorId } = req.params;
+        const school = await handleGetSchoolById(schoolId);
+        const staff = await handleGetCoordinatorById(coordinatorId);
+
+        if (!staff) {
+            return res.redirect(`/admin/schools/${schoolId}/staff?error=Coordinator not found`);
+        }
+
+        res.render('admin/staff/form', {
+            title: 'Edit Coordinator',
+            school,
+            staff,
+            staffRole: 'Coordinator',
+            isEdit: true
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function updateCoordinator(req, res, next) {
+    try {
+        const { schoolId, coordinatorId } = req.params;
+        const { name, phone, email, date_of_birth } = req.body;
+
+        await handleUpdateCoordinator(coordinatorId, {
+            name,
+            phone: parseInt(phone),
+            email,
+            date_of_birth: date_of_birth ? new Date(date_of_birth) : undefined
+        });
+
+        res.redirect(`/admin/schools/${schoolId}/staff?success=Coordinator updated successfully`);
+    } catch (error) {
+        res.redirect(`/admin/schools/${req.params.schoolId}/staff?error=${error.message}`);
+    }
+}
+
+async function deleteCoordinator(req, res, next) {
+    try {
+        const { schoolId, coordinatorId } = req.params;
+        await handleDeleteCoordinator(coordinatorId);
+        res.redirect(`/admin/schools/${schoolId}/staff?success=Coordinator removed successfully`);
+    } catch (error) {
+        res.redirect(`/admin/schools/${req.params.schoolId}/staff?error=${error.message}`);
+    }
+}
+
+// ==================== MANAGER CONTROLLERS ====================
+
+async function showCreateManager(req, res, next) {
+    try {
+        const { schoolId } = req.params;
+        const school = await handleGetSchoolById(schoolId);
+
+        res.render('admin/staff/form', {
+            title: 'Add Manager',
+            school,
+            staff: null,
+            staffRole: 'Manager',
+            isEdit: false
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function createManager(req, res, next) {
+    try {
+        const { schoolId } = req.params;
+        const { name, phone, email, date_of_birth } = req.body;
+
+        await handleCreateManager({
+            name,
+            phone: parseInt(phone),
+            email,
+            date_of_birth: date_of_birth ? new Date(date_of_birth) : undefined,
+            school_id: schoolId
+        });
+
+        res.redirect(`/admin/schools/${schoolId}/staff?success=Manager added successfully`);
+    } catch (error) {
+        res.redirect(`/admin/schools/${req.params.schoolId}/staff?error=${error.message}`);
+    }
+}
+
+async function showEditManager(req, res, next) {
+    try {
+        const { schoolId, managerId } = req.params;
+        const school = await handleGetSchoolById(schoolId);
+        const staff = await handleGetManagerById(managerId);
+
+        if (!staff) {
+            return res.redirect(`/admin/schools/${schoolId}/staff?error=Manager not found`);
+        }
+
+        res.render('admin/staff/form', {
+            title: 'Edit Manager',
+            school,
+            staff,
+            staffRole: 'Manager',
+            isEdit: true
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function updateManager(req, res, next) {
+    try {
+        const { schoolId, managerId } = req.params;
+        const { name, phone, email, date_of_birth } = req.body;
+
+        await handleUpdateManager(managerId, {
+            name,
+            phone: parseInt(phone),
+            email,
+            date_of_birth: date_of_birth ? new Date(date_of_birth) : undefined
+        });
+
+        res.redirect(`/admin/schools/${schoolId}/staff?success=Manager updated successfully`);
+    } catch (error) {
+        res.redirect(`/admin/schools/${req.params.schoolId}/staff?error=${error.message}`);
+    }
+}
+
+async function deleteManager(req, res, next) {
+    try {
+        const { schoolId, managerId } = req.params;
+        await handleDeleteManager(managerId);
+        res.redirect(`/admin/schools/${schoolId}/staff?success=Manager removed successfully`);
+    } catch (error) {
+        res.redirect(`/admin/schools/${req.params.schoolId}/staff?error=${error.message}`);
+    }
+}
+
+// ==================== TEACHER DETAIL CONTROLLERS ====================
+
+async function showTeacherDetails(req, res, next) {
+    try {
+        const { schoolId, teacherId } = req.params;
+        const school = await handleGetSchoolById(schoolId);
+        const data = await handleGetTeacherDetails(teacherId);
+
+        res.render('admin/teachers/detail', {
+            title: `${data.teacher.name} - Teacher Details`,
+            school,
+            ...data,
+            success: req.query.success,
+            error: req.query.error
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// ==================== STUDENT DETAIL CONTROLLERS ====================
+
+async function showStudentDetails(req, res, next) {
+    try {
+        const { schoolId, studentId } = req.params;
+        const school = await handleGetSchoolById(schoolId);
+        const data = await handleGetStudentDetails(studentId);
+
+        res.render('admin/students/detail', {
+            title: `${data.student.name} - Student Details`,
+            school,
+            ...data,
+            success: req.query.success,
+            error: req.query.error
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     showLoginPage,
     login,
@@ -931,5 +1183,21 @@ module.exports = {
     promoteAllClasses,
     showHardReset,
     hardReset,
-    search
+    search,
+    // Staff management
+    showStaff,
+    showCreateCoordinator,
+    createCoordinator,
+    showEditCoordinator,
+    updateCoordinator,
+    deleteCoordinator,
+    showCreateManager,
+    createManager,
+    showEditManager,
+    updateManager,
+    deleteManager,
+    // Detail views
+    showTeacherDetails,
+    showStudentDetails
 };
+

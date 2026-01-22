@@ -162,7 +162,8 @@
                                                                             <% if (student.studentProfile) { %>
                                                                                 <span class="badge bg-success me-1">P:
                                                                                     <%= student.studentProfile.total_presents
-                                                                                        || 0 %></span>
+                                                                                        || 0 %>
+                                                                                </span>
                                                                                 <span class="badge bg-danger">A: <%=
                                                                                         student.studentProfile.total_absents
                                                                                         || 0 %></span>
@@ -171,6 +172,11 @@
                                                                                     <% } %>
                                                                         </td>
                                                                         <td class="action-buttons">
+                                                                            <a href="/admin/schools/<%= school._id %>/students/<%= student._id %>"
+                                                                                class="btn btn-outline-primary btn-sm"
+                                                                                title="View Details">
+                                                                                <i class="bi bi-eye"></i>
+                                                                            </a>
                                                                             <a href="/admin/schools/<%= school._id %>/students/<%= student._id %>/edit"
                                                                                 class="btn btn-outline-warning btn-sm"
                                                                                 title="Edit">

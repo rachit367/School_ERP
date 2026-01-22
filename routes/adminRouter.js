@@ -48,7 +48,22 @@ const {
     promoteAllClasses,
     showHardReset,
     hardReset,
-    search
+    search,
+    // Staff management
+    showStaff,
+    showCreateCoordinator,
+    createCoordinator,
+    showEditCoordinator,
+    updateCoordinator,
+    deleteCoordinator,
+    showCreateManager,
+    createManager,
+    showEditManager,
+    updateManager,
+    deleteManager,
+    // Detail views
+    showTeacherDetails,
+    showStudentDetails
 } = require('../controllers/adminController');
 const { isAdminAuthenticated, isAdminLoggedIn } = require('../middlewares/adminAuth');
 
@@ -90,10 +105,26 @@ router.get('/schools/:schoolId/classes/:classId/edit', showEditClass);
 router.post('/schools/:schoolId/classes/:classId', updateClass);
 router.post('/schools/:schoolId/classes/:classId/delete', deleteClass);
 
+// ==================== STAFF ROUTES ====================
+router.get('/schools/:schoolId/staff', showStaff);
+// Coordinator routes
+router.get('/schools/:schoolId/staff/coordinator/new', showCreateCoordinator);
+router.post('/schools/:schoolId/staff/coordinator', createCoordinator);
+router.get('/schools/:schoolId/staff/coordinator/:coordinatorId/edit', showEditCoordinator);
+router.post('/schools/:schoolId/staff/coordinator/:coordinatorId', updateCoordinator);
+router.post('/schools/:schoolId/staff/coordinator/:coordinatorId/delete', deleteCoordinator);
+// Manager routes
+router.get('/schools/:schoolId/staff/manager/new', showCreateManager);
+router.post('/schools/:schoolId/staff/manager', createManager);
+router.get('/schools/:schoolId/staff/manager/:managerId/edit', showEditManager);
+router.post('/schools/:schoolId/staff/manager/:managerId', updateManager);
+router.post('/schools/:schoolId/staff/manager/:managerId/delete', deleteManager);
+
 // ==================== TEACHER ROUTES ====================
 router.get('/schools/:schoolId/teachers', showTeachers);
 router.get('/schools/:schoolId/teachers/new', showCreateTeacher);
 router.post('/schools/:schoolId/teachers', createTeacher);
+router.get('/schools/:schoolId/teachers/:teacherId', showTeacherDetails);
 router.get('/schools/:schoolId/teachers/:teacherId/edit', showEditTeacher);
 router.post('/schools/:schoolId/teachers/:teacherId', updateTeacher);
 router.post('/schools/:schoolId/teachers/:teacherId/delete', deleteTeacher);
@@ -103,6 +134,7 @@ router.post('/schools/:schoolId/teachers/bulk-delete', bulkDeleteTeachers);
 router.get('/schools/:schoolId/students', showStudents);
 router.get('/schools/:schoolId/students/new', showCreateStudent);
 router.post('/schools/:schoolId/students', createStudent);
+router.get('/schools/:schoolId/students/:studentId', showStudentDetails);
 router.get('/schools/:schoolId/students/:studentId/edit', showEditStudent);
 router.post('/schools/:schoolId/students/:studentId', updateStudent);
 router.post('/schools/:schoolId/students/:studentId/delete', deleteStudent);
@@ -130,3 +162,4 @@ router.get('/reset', showHardReset);
 router.post('/reset', hardReset);
 
 module.exports = router;
+

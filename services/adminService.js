@@ -809,6 +809,226 @@ async function handleGetAvailableTeachersForClass(schoolId) {
     }).select('name email teacherProfile.employee_id').lean();
 }
 
+// ==================== COORDINATOR SERVICES ====================
+
+async function handleGetCoordinatorsBySchool(schoolId) {
+    return await User.find({ school_id: schoolId, role: 'Coordinator' }).lean();
+}
+
+async function handleGetCoordinatorById(coordinatorId) {
+    return await User.findOne({ _id: coordinatorId, role: 'Coordinator' })
+        .populate('school_id', 'name')
+        .lean();
+}
+
+async function handleCreateCoordinator(coordinatorData) {
+    const coordinator = await User.create({
+        ...coordinatorData,
+        role: 'Coordinator'
+    });
+    return coordinator;
+}
+
+async function handleUpdateCoordinator(coordinatorId, coordinatorData) {
+    const coordinator = await User.findOneAndUpdate(
+        { _id: coordinatorId, role: 'Coordinator' },
+        coordinatorData,
+        { new: true, runValidators: true }
+    );
+    if (!coordinator) throw new Error('Coordinator not found');
+    return coordinator;
+}
+
+async function handleDeleteCoordinator(coordinatorId) {
+    const coordinator = await User.findOne({ _id: coordinatorId, role: 'Coordinator' });
+    if (!coordinator) throw new Error('Coordinator not found');
+    await User.findByIdAndDelete(coordinatorId);
+    return true;
+}
+
+// ==================== MANAGER SERVICES ====================
+
+async function handleGetManagersBySchool(schoolId) {
+    return await User.find({ school_id: schoolId, role: 'Manager' }).lean();
+}
+
+async function handleGetManagerById(managerId) {
+    return await User.findOne({ _id: managerId, role: 'Manager' })
+        .populate('school_id', 'name')
+        .lean();
+}
+
+async function handleCreateManager(managerData) {
+    const manager = await User.create({
+        ...managerData,
+        role: 'Manager'
+    });
+    return manager;
+}
+
+async function handleUpdateManager(managerId, managerData) {
+    const manager = await User.findOneAndUpdate(
+        { _id: managerId, role: 'Manager' },
+        managerData,
+        { new: true, runValidators: true }
+    );
+    if (!manager) throw new Error('Manager not found');
+    return manager;
+}
+
+async function handleDeleteManager(managerId) {
+    const manager = await User.findOne({ _id: managerId, role: 'Manager' });
+    if (!manager) throw new Error('Manager not found');
+    await User.findByIdAndDelete(managerId);
+    return true;
+}
+
+// ==================== STAFF AGGREGATE SERVICES ====================
+
+async function handleGetAllStaffBySchool(schoolId) {
+    const [principal, coordinators, managers] = await Promise.all([
+        User.findOne({ school_id: schoolId, role: 'Principal' }).lean(),
+        User.find({ school_id: schoolId, role: 'Coordinator' }).lean(),
+        User.find({ school_id: schoolId, role: 'Manager' }).lean()
+    ]);
+    return { principal, coordinators, managers };
+}
+
+// ==================== TEACHER DETAIL SERVICES ====================
+
+async function handleGetTeacherDetails(teacherId) {
+    const Announcement = require('../models/announcementModel');
+
+    const teacher = await User.findOne({ _id: teacherId, role: 'Teacher' })
+        .populate('school_id', 'name')
+        .populate('teacherProfile.class_teacher_of', 'class_name section')
+        .populate('teacherProfile.classes_assigned', 'class_name section')
+        .lean();
+
+    if (!teacher) throw new Error('Teacher not found');
+
+    // Get 30 days ago date
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Fetch related data
+    const [homework, announcements] = await Promise.all([
+        Homework.find({
+            created_by: teacherId,
+            createdAt: { $gte: thirtyDaysAgo }
+        })
+            .populate('class_id', 'class_name section')
+            .sort({ createdAt: -1 })
+            .lean(),
+
+        Announcement.find({
+            created_by: teacherId,
+            createdAt: { $gte: thirtyDaysAgo }
+        })
+            .populate('class_id', 'class_name section')
+            .sort({ createdAt: -1 })
+            .lean()
+    ]);
+
+    return {
+        teacher,
+        homework,
+        announcements,
+        stats: {
+            totalHomework: homework.length,
+            totalAnnouncements: announcements.length,
+            classesAssigned: teacher.teacherProfile?.classes_assigned?.length || 0
+        }
+    };
+}
+
+// ==================== STUDENT DETAIL SERVICES ====================
+
+async function handleGetStudentDetails(studentId) {
+    const Leave = require('../models/leaveModel');
+
+    const student = await User.findOne({ _id: studentId, role: 'Student' })
+        .populate('school_id', 'name')
+        .populate('studentProfile.class_id', 'class_name section')
+        .lean();
+
+    if (!student) throw new Error('Student not found');
+
+    // Get 30 days ago date
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Fetch related data
+    const [attendance, marks, leaves, homeworkSubmissions] = await Promise.all([
+        Attendance.find({
+            student_id: studentId,
+            date: { $gte: thirtyDaysAgo }
+        })
+            .sort({ date: -1 })
+            .lean(),
+
+        Marks.find({ student_id: studentId })
+            .populate('exam_id', 'name subject total_marks date')
+            .sort({ createdAt: -1 })
+            .limit(20)
+            .lean(),
+
+        Leave.find({
+            student: studentId,
+            createdAt: { $gte: thirtyDaysAgo }
+        })
+            .sort({ createdAt: -1 })
+            .lean(),
+
+        // Get homework submissions from the class
+        student.studentProfile?.class_id ?
+            Homework.find({
+                class_id: student.studentProfile.class_id._id || student.studentProfile.class_id,
+                createdAt: { $gte: thirtyDaysAgo }
+            })
+                .sort({ deadline: -1 })
+                .lean()
+            : []
+    ]);
+
+    // Calculate attendance stats
+    const attendanceStats = {
+        present: attendance.filter(a => a.status === 'P').length,
+        absent: attendance.filter(a => a.status === 'A').length,
+        leave: attendance.filter(a => a.status === 'L').length,
+        total: attendance.length
+    };
+
+    // Process homework with submission status
+    const processedHomework = homeworkSubmissions.map(hw => {
+        const submission = hw.submitted_by?.find(
+            s => s.student_id?.toString() === studentId
+        );
+        return {
+            ...hw,
+            submitted: !!submission,
+            submittedAt: submission?.submitted_at
+        };
+    });
+
+    return {
+        student,
+        attendance,
+        attendanceStats,
+        marks,
+        leaves,
+        homework: processedHomework,
+        stats: {
+            attendancePercentage: attendanceStats.total > 0
+                ? Math.round((attendanceStats.present / attendanceStats.total) * 100)
+                : 0,
+            totalExams: marks.length,
+            pendingLeaves: leaves.filter(l => l.status === 'Pending').length
+        }
+    };
+}
+
+
 module.exports = {
     handleAuthenticateAdmin,
     handleCreateDefaultAdmin,
@@ -849,5 +1069,22 @@ module.exports = {
     handlePromoteAllClasses,
     handleHardResetAcademicYear,
     handleSearchUsers,
-    handleGetAvailableTeachersForClass
+    handleGetAvailableTeachersForClass,
+    // Coordinator services
+    handleGetCoordinatorsBySchool,
+    handleGetCoordinatorById,
+    handleCreateCoordinator,
+    handleUpdateCoordinator,
+    handleDeleteCoordinator,
+    // Manager services
+    handleGetManagersBySchool,
+    handleGetManagerById,
+    handleCreateManager,
+    handleUpdateManager,
+    handleDeleteManager,
+    // Staff aggregate services
+    handleGetAllStaffBySchool,
+    // Detail view services
+    handleGetTeacherDetails,
+    handleGetStudentDetails
 };

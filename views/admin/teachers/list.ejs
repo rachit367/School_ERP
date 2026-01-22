@@ -133,7 +133,8 @@
                                                                                     2) { %>
                                                                                     <span class="badge bg-secondary">+
                                                                                         <%= teacher.teacherProfile.subjects.length
-                                                                                            - 2 %></span>
+                                                                                            - 2 %>
+                                                                                    </span>
                                                                                     <% } %>
                                                                                         <% } else { %>
                                                                                             <span
@@ -167,6 +168,11 @@
                                                                             <% } %>
                                                                 </td>
                                                                 <td class="action-buttons">
+                                                                    <a href="/admin/schools/<%= school._id %>/teachers/<%= teacher._id %>"
+                                                                        class="btn btn-outline-primary btn-sm"
+                                                                        title="View Details">
+                                                                        <i class="bi bi-eye"></i>
+                                                                    </a>
                                                                     <a href="/admin/schools/<%= school._id %>/teachers/<%= teacher._id %>/edit"
                                                                         class="btn btn-outline-warning btn-sm"
                                                                         title="Edit">
