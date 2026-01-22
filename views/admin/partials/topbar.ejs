@@ -8,10 +8,74 @@
             <%= typeof pageTitle !=='undefined' ? pageTitle : 'Dashboard' %>
         </h1>
     </div>
+    
+    <!-- Search Bar -->
+    <div class="topbar-center d-none d-lg-flex">
+        <div class="search-wrapper">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search schools, students, teachers..." id="globalSearch">
+            <span class="search-shortcut">Ctrl+K</span>
+        </div>
+    </div>
+    
     <div class="topbar-right">
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+            <i class="bi bi-sun-fill icon-sun"></i>
+            <i class="bi bi-moon-fill icon-moon"></i>
+        </button>
+        
         <a href="/admin/logout" class="btn btn-secondary btn-sm">
             <i class="bi bi-box-arrow-right"></i>
             <span class="d-none d-md-inline">Logout</span>
         </a>
     </div>
 </header>
+
+<script>
+    // Theme Toggle Functionality
+    (function() {
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // Get saved theme or default to light
+        const savedTheme = localStorage.getItem('gyanama-theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        
+        themeToggle?.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('gyanama-theme', newTheme);
+        });
+    })();
+    
+    // Global Search Shortcut (Ctrl+K)
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            document.getElementById('globalSearch')?.focus();
+        }
+        
+        // Escape to blur search
+        if (e.key === 'Escape') {
+            document.getElementById('globalSearch')?.blur();
+        }
+    });
+    
+    // Simple search functionality
+    document.getElementById('globalSearch')?.addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase();
+        if (query.length < 2) return;
+        
+        // Highlight matching table rows if on a page with tables
+        document.querySelectorAll('table tbody tr').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(query)) {
+                row.style.background = 'var(--primary-50)';
+            } else {
+                row.style.background = '';
+            }
+        });
+    });
+</script>

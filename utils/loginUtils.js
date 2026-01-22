@@ -1,6 +1,6 @@
 function capitalizeFullName(name) {
   if (!name) return "";
-  
+
   return name
     .split(" ")
     .filter(word => word.trim() !== "")
@@ -8,6 +8,9 @@ function capitalizeFullName(name) {
     .join(" ");
 }
 
-const normalizePhone = (phone) => phone.replace(/\s+/g, "");
+const normalizePhone = (phone) => {
+  if (!phone || typeof phone !== 'string') return '';
+  return phone.replace(/\s+/g, '');
+};
 
-module.exports={capitalizeFullName,normalizePhone}
+module.exports = { capitalizeFullName, normalizePhone }
