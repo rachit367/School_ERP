@@ -1,11 +1,11 @@
-const crypto=require('crypto')
-function generateOtp(){
-    const otp=crypto.randomInt(100000,999999).toString();
+const crypto = require('crypto')
+function generateOtp() {
+    const otp = crypto.randomInt(100000, 999999).toString();
     return otp
 }
 
-function hashOtp(otp){
-    return crypto.createHash("sha256").update(otp).digest("hex")
+function hashOtp(otp) {
+    return crypto.createHash("sha256").update(otp.toString()).digest("hex")
 }
 
-module.exports={generateOtp,hashOtp}
+module.exports = { generateOtp, hashOtp }

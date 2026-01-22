@@ -8,9 +8,17 @@ function capitalizeFullName(name) {
     .join(" ");
 }
 
-const normalizePhone = (phone) => {
-  if (!phone || typeof phone !== 'string') return '';
-  return phone.replace(/\s+/g, '');
-};
+function normalizePhone(phone) {
+  if (phone === null || phone === undefined) return 0;
+
+  // Convert number to string first
+  let phoneStr = phone.toString();
+
+  // Remove spaces (just in case)
+  phoneStr = phoneStr.replace(/\s+/g, '');
+
+  // Convert back to integer
+  return parseInt(phoneStr, 10);
+}
 
 module.exports = { capitalizeFullName, normalizePhone }
