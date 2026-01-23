@@ -8,23 +8,14 @@
             <%= typeof pageTitle !=='undefined' ? pageTitle : 'Dashboard' %>
         </h1>
     </div>
-    
-    <!-- Search Bar -->
-    <div class="topbar-center d-none d-lg-flex">
-        <div class="search-wrapper">
-            <i class="bi bi-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Search schools, students, teachers..." id="globalSearch">
-            <span class="search-shortcut">Ctrl+K</span>
-        </div>
-    </div>
-    
+
     <div class="topbar-right">
         <!-- Theme Toggle -->
         <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
             <i class="bi bi-sun-fill icon-sun"></i>
             <i class="bi bi-moon-fill icon-moon"></i>
         </button>
-        
+
         <a href="/admin/logout" class="btn btn-secondary btn-sm">
             <i class="bi bi-box-arrow-right"></i>
             <span class="d-none d-md-inline">Logout</span>
@@ -34,48 +25,46 @@
 
 <script>
     // Theme Toggle Functionality
-    (function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const themeToggle = document.getElementById('themeToggle');
         const html = document.documentElement;
-        
-        // Get saved theme or default to light
-        const savedTheme = localStorage.getItem('gyanama-theme') || 'light';
-        html.setAttribute('data-theme', savedTheme);
-        
-        themeToggle?.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('gyanama-theme', newTheme);
-        });
-    })();
-    
-    // Global Search Shortcut (Ctrl+K)
-    document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            document.getElementById('globalSearch')?.focus();
+        const iconSun = document.querySelector('.icon-sun');
+        const iconMoon = document.querySelector('.icon-moon');
+
+        // Use a safe fallback for local storage access
+        let savedTheme = 'light';
+        try {
+            savedTheme = localStorage.getItem('gyanama-theme') || 'light';
+        } catch (e) {
+            console.error('Local storage access failed', e);
         }
-        
-        // Escape to blur search
-        if (e.key === 'Escape') {
-            document.getElementById('globalSearch')?.blur();
+
+        // Ensure attribute is set if not already present
+        if (!html.hasAttribute('data-theme')) {
+            html.setAttribute('data-theme', savedTheme);
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent any default button behavior
+
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                html.setAttribute('data-theme', newTheme);
+                try {
+                    localStorage.setItem('gyanama-theme', newTheme);
+                } catch (e) {
+                    // Ignore local storage errors
+                }
+
+                // Optional: visual feedback or animation trigger if needed
+                console.log('Theme toggled to:', newTheme);
+            });
+        } else {
+            console.warn('Theme toggle button not found');
         }
     });
-    
-    // Simple search functionality
-    document.getElementById('globalSearch')?.addEventListener('input', function(e) {
-        const query = e.target.value.toLowerCase();
-        if (query.length < 2) return;
-        
-        // Highlight matching table rows if on a page with tables
-        document.querySelectorAll('table tbody tr').forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(query)) {
-                row.style.background = 'var(--primary-50)';
-            } else {
-                row.style.background = '';
-            }
-        });
-    });
+
+    // Global Search Shortcut handler removed
 </script>
