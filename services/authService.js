@@ -71,7 +71,7 @@ async function verifyOtpService(otp, phone) {
 }
 
 //req:refreshToken  //res:success,accessToken
-async function refreshTokenService(refreshToken) {     // use refresh token rotation for better security afterwards
+async function accessTokenService(refreshToken) {     // use refresh token rotation for better security afterwards
   let decoded;
   try {
     decoded = jwt.verify(
@@ -109,5 +109,5 @@ module.exports = {
   sendOtpService,
   handleGetUserDetails,
   verifyOtpService,
-  refreshTokenService
+  accessTokenService
 };

@@ -1,4 +1,4 @@
-const {sendOtpService,verifyOtpService, refreshTokenService, handleGetUserDetails}=require('./../services/authService');
+const {sendOtpService,verifyOtpService, accessTokenService, handleGetUserDetails}=require('./../services/authService');
 
 //req:phone,name  //res:statusCode,message
 async function sendOtp(req,res,next) { 
@@ -26,7 +26,7 @@ return res.status(200).json(result);
 }
 
 //req:refreshToken  //res:success,accessToken
-async function refreshToken(req,res,next){ 
+async function accessToken(req,res,next){ 
     try {
     const refreshToken = req.headers['x-refresh-token'];
 
@@ -63,4 +63,4 @@ async function getUserDetails(req,res,next){
         next(err)
     }
 }
-module.exports={sendOtp,verifyOtp,refreshToken,getUserDetails}
+module.exports={sendOtp,verifyOtp,accessToken,getUserDetails}
