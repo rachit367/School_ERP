@@ -26,6 +26,11 @@ const schoolSchema=new mongoose.Schema({
     logo:{
         type:String,
         default:null
+    },
+    plan:{
+        type:String,
+        enum:['Assist','Autonomy','Automate'],
+        default:'Assist'
     }
 },{timestamps:true})
 
