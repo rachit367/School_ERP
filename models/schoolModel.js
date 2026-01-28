@@ -22,6 +22,10 @@ const schoolSchema=new mongoose.Schema({
         type:Number,
         min:0,
         default:0
+    },
+    logo:{
+        type:String,
+        default:null
     }
 },{timestamps:true})
 
