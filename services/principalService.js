@@ -1,6 +1,7 @@
 const schoolModel=require('../models/schoolModel')
 const classAttendanceSummaryModel=require('../models/classAttendanceSummaryModel')
 const bullyModel=require('./../models/bullyModel');
+const classModel=require('./../models/classModel');
 
 // req: school_id  // res: { total_students, total_teachers, total_absents, [class_name]: { [section]: { _id,attendance, class_teacher } } }
 async function handleGetStats(school_id) {
