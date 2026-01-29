@@ -3,7 +3,7 @@ const otpModel = require('./../models/otpModel');
 
 const jwt = require('jsonwebtoken');
 
-const {sendOtpMail} = require('../utils/mailer');
+
 const { generateOtp, hashOtp } = require('./../utils/otpUtil');
 const { generateAccessToken, generateRefreshToken } = require('../utils/tokenUtil');
 const { capitalizeFullName, normalizePhone } = require('../utils/loginUtils');
@@ -29,7 +29,7 @@ async function sendOtpService(phone, name) {
   
   // Send OTP with your SMS provider here
   console.log("OTP for testing:", otp);
-  await sendOtpMail("bhakindar445@gmail.com", otp);
+
   return { statusCode: 200, message: "OTP sent successfully" };
 }
 
