@@ -36,7 +36,7 @@ async function accessToken(req,res,next){
       throw err;
     }
 
-    const result = await refreshTokenService(refreshToken);
+    const result = await accessTokenService(refreshToken);
 
     if (!result.success) {
       const err = new Error(result.message);
