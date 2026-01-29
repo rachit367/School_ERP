@@ -11,7 +11,7 @@ const ptmModel=require('../models/ptmModel')
 const bullyModel=require('../models/bullyModel')
 const mongoose=require('mongoose')
 
-//req:school_id  // res: [{ class_name:total_students,total_sections ,[section]:{_id,class_teacher_name,students}}]
+
 //req:school_id  // res: [{ class_name, total_students, total_sections, [section]: { class_id, class_teacher_name, students } }]
 async function handleGetClasses(school_id) {
     const result = await classModel.aggregate([
@@ -272,6 +272,5 @@ module.exports={
     handleGetClasses,
     handleGetSections,
     handleGetStudentDetails,
-    handleGetStudentsInSection,
-    handleTransferStudent
+    handleGetStudentsInSection
 }
