@@ -2,6 +2,11 @@ const userModel=require('../models/userModel')
 const getClassId=require('../utils/classIdUtil')
 const classModel=require('../models/classModel')
 const schoolModel=require('./../models/schoolModel')
+const homeworkModel=require('./../models/homeworkModel')
+const doubtModel=require('../models/doubtModel')
+const announcementModel=require('../models/announcementModel')
+const examModel=require('../models/examModel')
+const timetableModel=require('../models/timetableModel')
 
 //req:  //res: [{ _id, name, role, designation, subjects, classes_assigned,announcement_allowed }]
 async function handleGetAllTeachers(school_id) {

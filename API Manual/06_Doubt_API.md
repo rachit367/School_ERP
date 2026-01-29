@@ -129,6 +129,107 @@ OR
 
 ---
 
+## Student Endpoints
+
+### 3. Get Subject Doubts (Student)
+Get all doubts posted by the student for a specific teacher/subject.
+
+**Endpoint**: `GET /api/doubt/subject`
+
+**Authentication Required**: Yes (Student only)
+
+**Query Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| teacher_id | String (ObjectId) | Yes | Teacher's user ID |
+
+**Example**: `GET /api/doubt/subject?teacher_id=507f1f77bcf86cd799439021`
+
+**Success Response** (200):
+```json
+[
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "subject": "Mathematics",
+    "doubt": "How to solve quadratic equations?",
+    "reply": "Use the quadratic formula...",
+    "replied_at": "2024-01-15T14:30:00.000Z",
+    "status": "Resolved"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439012",
+    "subject": "Mathematics",
+    "doubt": "What is the Pythagorean theorem?",
+    "reply": "",
+    "replied_at": "",
+    "status": "Pending"
+  }
+]
+```
+
+---
+
+### 4. Get Doubt Details (Student)
+Get detailed information about a specific doubt.
+
+**Endpoint**: `GET /api/doubt/:id`
+
+**Authentication Required**: Yes (Student only)
+
+**URL Parameters**:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| id | String (ObjectId) | Doubt ID |
+
+**Example**: `GET /api/doubt/507f1f77bcf86cd799439011`
+
+**Success Response** (200):
+```json
+{
+  "teacher": "John Smith",
+  "doubt": "How to solve quadratic equations?",
+  "reply": "Use the quadratic formula: x = (-b ± √(b²-4ac)) / 2a",
+  "replied_at": "2024-01-15T14:30:00.000Z"
+}
+```
+
+---
+
+### 5. Post Doubt (Student)
+Submit a new doubt to a teacher.
+
+**Endpoint**: `POST /api/doubt/subject`
+
+**Authentication Required**: Yes (Student only)
+
+**Request Body**:
+```json
+{
+  "class_id": "507f1f77bcf86cd799439013",
+  "teacher_id": "507f1f77bcf86cd799439021",
+  "subject": "Mathematics",
+  "doubt": "I don't understand how to solve quadratic equations"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| class_id | String (ObjectId) | Yes | Student's class ID |
+| teacher_id | String (ObjectId) | Yes | Teacher's user ID |
+| subject | String | Yes | Subject name |
+| doubt | String | Yes | The question/doubt text |
+
+**Success Response** (200):
+```json
+{
+  "success": true
+}
+```
+
+---
+
 ## Doubt Status
 
 | Status | Description |
@@ -144,6 +245,9 @@ OR
 |----------|---------|---------|-----------|
 | GET / | ❌ | ✅ | ❌* |
 | PATCH /:id | ❌ | ✅ | ❌* |
+| GET /subject | ✅ | ❌ | ❌ |
+| GET /:id | ✅ | ❌ | ❌ |
+| POST /subject | ✅ | ❌ | ❌ |
 
 *Principal role can access if specifically granted teacher-like permissions
 
@@ -167,41 +271,36 @@ Teacher replies (PATCH /:id)
 
 ## Notes
 
-1. **Teacher Only Access**:
-   - All doubt endpoints are restricted to teachers
-   - Students cannot access these endpoints directly
-   - Student doubt submission endpoint needs to be implemented
+1. **Access Control**:
+   - Teacher endpoints (GET /, PATCH /:id) require `isTeacher` middleware
+   - Student endpoints are accessible to authenticated students only
+   - Each student can only view their own doubts
 
 2. **Reply Behavior**:
    - Sending `reply` with text: Adds teacher's response and marks as resolved
    - Sending empty `reply` or no reply field: Marks doubt as resolved without adding a response
    - Useful for verbal clarifications or doubts resolved in class
 
-3. **Missing Student Endpoints**:
-   The following student endpoints are not yet implemented:
-   - `POST /api/doubt` - Student creates a new doubt
-   - `GET /api/doubt/student` - Student views their own doubts
-   - `GET /api/doubt/student/:id` - Student views specific doubt details
-
-4. **Doubt Visibility**:
+3. **Doubt Visibility**:
    - Teachers see doubts from students in their assigned classes
-   - Teachers see doubts for subjects they teach
+   - Students see only their own doubts filtered by teacher
 
-5. **Timestamps**:
+4. **Timestamps**:
    - `createdAt`: When student posted the doubt
    - `repliedAt`: When teacher responded (if applicable)
 
-6. **Multiple Updates**:
+5. **Multiple Updates**:
    - Teachers can update their reply multiple times
    - Each update changes the `repliedAt` timestamp
    - Status remains "Resolved" once set
 
-7. **Subject Field**:
+6. **Subject Field**:
    - Should match subjects taught by the teacher
    - Used for filtering and organization
 
-8. **Pending Implementation**:
+7. **Pending Implementation**:
    - File/image attachment for doubts
-   - Student endpoints for doubt creation and viewing
    - Notification system when teacher replies
+   - Doubt categorization by topic/chapter
+
    - Doubt categorization by topic/chapter

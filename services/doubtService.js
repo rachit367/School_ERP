@@ -50,7 +50,6 @@ async function handleGetSubjectDoubts(teacher_id,student_id,school_id) {
 
 //req:class_id,teacher_id,subject,doubt  //res:success
 async function handlePostDoubt(school_id,student_id,class_id,teacher_id,subject,doubt) {
-    async function handlePostDoubt(school_id,student_id,class_id,teacher_id,subject,doubt) {
     await doubtModel.create({
         school_id,
         class_id,
@@ -60,7 +59,6 @@ async function handlePostDoubt(school_id,student_id,class_id,teacher_id,subject,
         doubt: doubt  
     })
     return {success:true}
-}
 }
 
 //req:doubt_id //res:teacher_name,doubt,reply,replied_at

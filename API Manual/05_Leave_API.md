@@ -26,38 +26,41 @@ Get leave request history for the authenticated user.
 
 **Success Response** (200):
 ```json
-[
-  {
-    "_id": "507f1f77bcf86cd799439011",
-    "status": "Approved",
-    "reason": "Fever and cold",
-    "start_date": "2024-01-15T00:00:00.000Z",
-    "end_date": "2024-01-17T00:00:00.000Z"
-  },
-  {
-    "_id": "507f1f77bcf86cd799439012",
-    "status": "Pending",
-    "reason": "Family function",
-    "start_date": "2024-01-20T00:00:00.000Z",
-    "end_date": "2024-01-20T00:00:00.000Z"
-  },
-  {
-    "_id": "507f1f77bcf86cd799439013",
-    "status": "Rejected",
-    "reason": "",
-    "start_date": "2024-01-10T00:00:00.000Z",
-    "end_date": "2024-01-10T00:00:00.000Z"
-  }
-]
+{
+  "history": [
+    {
+      "_id": "507f1f77bcf86cd799439011",
+      "status": "Approved",
+      "reason": "Fever and cold",
+      "start_date": "2024-01-15T00:00:00.000Z",
+      "end_date": "2024-01-17T00:00:00.000Z"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439012",
+      "status": "Pending",
+      "reason": "Family function",
+      "start_date": "2024-01-20T00:00:00.000Z",
+      "end_date": "2024-01-20T00:00:00.000Z"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439013",
+      "status": "Rejected",
+      "reason": "",
+      "start_date": "2024-01-10T00:00:00.000Z",
+      "end_date": "2024-01-10T00:00:00.000Z"
+    }
+  ]
+}
 ```
 
 | Response Field | Type | Description |
 |----------------|------|-------------|
-| _id | String (ObjectId) | Leave request unique identifier |
-| status | String | "Approved", "Rejected", or "Pending" |
-| reason | String | Reason for leave (optional) |
-| start_date | String (ISO Date) | Leave start date |
-| end_date | String (ISO Date) | Leave end date |
+| history | Array | Array of leave request objects |
+| history[]._id | String (ObjectId) | Leave request unique identifier |
+| history[].status | String | "Approved", "Rejected", or "Pending" |
+| history[].reason | String | Reason for leave (optional) |
+| history[].start_date | String (ISO Date) | Leave start date |
+| history[].end_date | String (ISO Date) | Leave end date |
 
 ---
 

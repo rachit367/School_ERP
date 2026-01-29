@@ -1,4 +1,5 @@
 const subjectModel=require('./../models/subjectModel')
+const userModel=require('./../models/userModel')
 
 //req:   //res:[{subject,teacher,teacher_id,_id}]
 async function handleGetAllSubjects(student_id,school_id) {

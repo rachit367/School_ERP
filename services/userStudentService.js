@@ -1,9 +1,15 @@
 const userModel=require('../models/userModel');
 const classModel=require('../models/classModel');
-const {calculateAge}=require('../utils/calculateAge');
-const {formatDOB}=require('../utils/formatDOB')
 const schoolModel=require('../models/schoolModel')
 const attendanceModel=require('./../models/attendanceModel')
+const homeworkModel=require('../models/homeworkModel')
+const marksModel=require('../models/marksModel')
+const feesModel=require('../models/feesModel')
+const doubtModel=require('../models/doubtModel')
+const leaveModel=require('../models/leaveModel')
+const ptmModel=require('../models/ptmModel')
+const bullyModel=require('../models/bullyModel')
+const mongoose=require('mongoose')
 
 //req:school_id  // res: [{ class_name:total_students,total_sections ,[section]:{_id,class_teacher_name,students}}]
 //req:school_id  // res: [{ class_name, total_students, total_sections, [section]: { class_id, class_teacher_name, students } }]
@@ -199,7 +205,7 @@ async function handleAddStudent(school_id,name,class_name,section,dob,roll_numbe
 
 //req:student_id  //res:success
 async function handleDeleteStudent(student_id){
-    async function handleDeleteStudent(student_id){
+
     const user = await userModel.findOne({ _id: student_id, role: 'Student' });
     if (!user) throw new Error("Student not found");
     // 1. Remove from school count
@@ -235,7 +241,7 @@ async function handleDeleteStudent(student_id){
     // 11. Finally delete the user
     await userModel.deleteOne({ _id: student_id });
     return { success: true };
-}
+
 }
 
 async function handleTransferStudent(student_id,section){

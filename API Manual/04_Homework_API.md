@@ -212,13 +212,108 @@ Create a new homework assignment.
 
 ## Student Endpoints
 
-Currently, there are no implemented student-specific homework endpoints in the router. The following endpoints need to be implemented:
+### 5. Get Subject Homeworks (Student)
+Get all homework for a specific subject, categorized by completion status.
 
-### Planned Endpoints (Not Yet Implemented):
-- `GET /api/homework/student` - Get all homework for logged-in student's class
-- `GET /api/homework/student/:id` - Get specific homework details
-- `POST /api/homework/submit/:id` - Submit homework
-- `GET /api/homework/student/submissions` - Get student's submission history
+**Endpoint**: `GET /api/homework/student`
+
+**Authentication Required**: Yes (Student only)
+
+**Query Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| class_id | String (ObjectId) | Yes | Student's class ID |
+| teacher_id | String (ObjectId) | Yes | Teacher ID for the subject |
+
+**Example**: `GET /api/homework/student?class_id=507f1f77bcf86cd799439013&teacher_id=507f1f77bcf86cd799439021`
+
+**Success Response** (200):
+```json
+{
+  "completed": [
+    {
+      "_id": "507f1f77bcf86cd799439011",
+      "topic": "Chapter 5 Exercise",
+      "description": "Complete all questions",
+      "deadline": "2024-01-20T00:00:00.000Z"
+    }
+  ],
+  "pending": [
+    {
+      "_id": "507f1f77bcf86cd799439012",
+      "topic": "Chapter 6 Problems",
+      "description": "Solve worksheet",
+      "deadline": "2024-01-25T00:00:00.000Z"
+    }
+  ],
+  "submitted": [
+    {
+      "_id": "507f1f77bcf86cd799439013",
+      "topic": "Chapter 4 Review",
+      "description": "Late submission",
+      "deadline": "2024-01-15T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+| Response Field | Type | Description |
+|----------------|------|-------------|
+| completed | Array | Homework submitted on time |
+| pending | Array | Homework not yet submitted |
+| submitted | Array | Homework submitted late |
+
+---
+
+### 6. Get Homework Details (Student)
+Get detailed information about a specific homework.
+
+**Endpoint**: `GET /api/homework/student/:homeworkid`
+
+**Authentication Required**: Yes (Student only)
+
+**URL Parameters**:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| homeworkid | String (ObjectId) | Homework ID |
+
+**Query Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| class_id | String (ObjectId) | Yes | Student's class ID |
+
+**Example**: `GET /api/homework/student/507f1f77bcf86cd799439011?class_id=507f1f77bcf86cd799439013`
+
+**Success Response** (200):
+```json
+{
+  "_id": "507f1f77bcf86cd799439011",
+  "topic": "Chapter 5 Exercise",
+  "description": "Complete all questions from page 45 to 50",
+  "deadline": "2024-01-20T00:00:00.000Z"
+}
+```
+
+---
+
+### 7. Submit Homework
+Submit homework (placeholder - file upload not yet implemented).
+
+**Endpoint**: `POST /api/homework/submit`
+
+**Authentication Required**: Yes (Student only)
+
+**Success Response** (200):
+```json
+{
+  "success": true
+}
+```
+
+**Note**: File upload functionality is pending S3 bucket integration.
 
 ---
 
@@ -230,6 +325,9 @@ Currently, there are no implemented student-specific homework endpoints in the r
 | GET /class/:classid | ❌ | ✅ | ✅ |
 | GET /:id | ❌ | ✅ | ✅ |
 | POST / | ❌ | ✅ | ✅ |
+| GET /student | ✅ | ❌ | ❌ |
+| GET /student/:homeworkid | ✅ | ❌ | ❌ |
+| POST /submit | ✅ | ❌ | ❌ |
 
 ---
 
@@ -251,12 +349,12 @@ Currently, there are no implemented student-specific homework endpoints in the r
    - Teachers can only view homework they created
    - Teachers can post homework for classes they're assigned to
 
-5. **Pending Implementation**:
-   - Student homework viewing and submission endpoints are marked in the router but not implemented
-   - File upload functionality for homework attachments needs implementation
-   - Homework editing/deletion endpoints are not yet available
+5. **Student Categories**:
+   - **completed**: Submitted before deadline
+   - **pending**: Not yet submitted
+   - **submitted**: Submitted after deadline (late)
 
 6. **Homework Visibility**:
    - Teachers see all homework they created across all their classes
-   - When viewing by class, only homework for that specific class is shown
-   - Students should only see homework for their own class (when implemented)
+   - Students see homework for their class filtered by teacher/subject
+

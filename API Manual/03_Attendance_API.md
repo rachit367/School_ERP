@@ -75,7 +75,37 @@ Get attendance records for a specific student within a date range.
 
 ---
 
-### 2. Check Allowed Class
+### 2. Get Overall Attendance
+Get overall attendance statistics for the authenticated student.
+
+**Endpoint**: `GET /api/attendance/overall`
+
+**Authentication Required**: Yes (Student only)
+
+**Request**: No parameters required
+
+**Success Response** (200):
+```json
+{
+  "P": 145,
+  "A": 5,
+  "L": 2,
+  "overall": "95.39",
+  "total_classes": 152
+}
+```
+
+| Response Field | Type | Description |
+|----------------|------|-------------|
+| P | Number | Total present days |
+| A | Number | Total absent days |
+| L | Number | Total leave days |
+| overall | String | Overall attendance percentage |
+| total_classes | Number | Total number of classes (P + A + L) |
+
+---
+
+### 3. Check Allowed Class
 Check if the authenticated teacher can mark attendance for a specific class.
 
 **Endpoint**: `GET /api/attendance/allowed-class/:id`
@@ -103,7 +133,7 @@ Check if the authenticated teacher can mark attendance for a specific class.
 
 ---
 
-### 3. Get Class Attendance
+### 4. Get Class Attendance
 Get attendance summary for a specific class.
 
 **Endpoint**: `GET /api/attendance/class/:classid`
@@ -164,7 +194,7 @@ Get attendance summary for a specific class.
 
 ---
 
-### 4. Save Daily Attendance
+### 5. Save Daily Attendance
 Mark or update attendance for a class.
 
 **Endpoint**: `POST /api/attendance/save`
@@ -237,7 +267,7 @@ OR if updating existing attendance:
 
 ---
 
-### 5. Assign Substitute Teacher
+### 6. Assign Substitute Teacher
 Allow another teacher to mark attendance for your class.
 
 **Endpoint**: `POST /api/attendance/substitute`
@@ -270,7 +300,7 @@ Allow another teacher to mark attendance for your class.
 
 ---
 
-### 6. Remove Substitute Teacher
+### 7. Remove Substitute Teacher
 Revoke substitute teacher's attendance permission.
 
 **Endpoint**: `DELETE /api/attendance/substitute`
@@ -319,6 +349,7 @@ Revoke substitute teacher's attendance permission.
 | Endpoint | Student | Teacher | Class Teacher | Principal |
 |----------|---------|---------|---------------|-----------|
 | GET /student/:id | ✅ | ✅ | ✅ | ✅ |
+| GET /overall | ✅ | ❌ | ❌ | ❌ |
 | GET /allowed-class/:id | ❌ | ✅ | ✅ | ✅ |
 | GET /class/:classid | ❌ | ✅ | ✅ | ✅ |
 | POST /save | ❌ | ✅* | ✅ | ✅ |

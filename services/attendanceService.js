@@ -370,7 +370,7 @@ async function handleGetOverallAttendance(school_id,student_id) {
     })
 
     result.total_classes=result.A+result.P+result.L
-    result.overall=((result.P/(result.total_classes))*100).toFixed(2)
+    result.overall = result.total_classes === 0 ? 0 : ((result.P / result.total_classes) * 100).toFixed(2)
     
     return result
     

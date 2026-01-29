@@ -78,7 +78,7 @@ async function getStudentHomeworkDetails(req, res, next){
   try {
     const school_id=req.school_id
     const user_id=req.user_id
-    const homework_id=req.params.homweworkid
+    const homework_id=req.params.homeworkid
     const class_id=req.query.class_id
     const data=await handleGetStudentHomeworkDetails(homework_id,school_id,class_id)
     res.status(200).json(data);
