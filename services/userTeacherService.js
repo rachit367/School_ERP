@@ -155,11 +155,8 @@ async function handleDeleteTeacher(teacher_id, school_id) {
 
             await timetableModel.updateMany(
                 { "periods.teacher": teacher_id },
-                { $set: { "periods.$[elem].teacher": null } },
-                {
-                    arrayFilters: [{ "elem.teacher": teacher_id }],
-                    session
-                }
+                { $pull: { periods: { teacher: teacher_id } } },
+                { session }
             );
 
             await schoolModel.updateOne(
