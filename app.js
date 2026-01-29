@@ -31,6 +31,9 @@ connectDB().then(() => {
   handleCreateDefaultAdmin().catch(console.error)
 })
 
+app.use(express.json());
+app.use(express.urlencoded({extended:true}))
+
 // Set up EJS as view engine for Admin Panel
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
