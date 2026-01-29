@@ -17,8 +17,8 @@ router.use(authenticateToken);
 //req:from_date,to_date,student_id  //res:{name,roll_number,{date:status},attendance_percentage,present,absent}
 router.get('/student/:id',getStudentAttendance)     //date in YYYY-MM-DD
 
-//req:    //res:P,A,L,overall,total_classes
-router.get('/overall',getOverallAttendance)
+//req:student_id    //res:P,A,L,overall,total_classes
+router.get('/overall',getOverallAttendance)   //for student
 
 //req:class_id // res: allowed(true or false)
 router.get('/allowed-class/:id',checkAllowedClass)

@@ -60,10 +60,12 @@ app.use('/admin', adminRouter)
 app.use('/api/auth', authRouter)
 
 app.use('/api/principal', principalUserRouter)
+app.use('/api/principal/dashboard', principalRouter)
+
 app.use('/api/teacher', teacherRouter)
 app.use('/api/student', studentRouter)
 
-app.use('/api/principal/dashboard', principalRouter)
+
 
 app.use('/api/announcement', announcementRouter)
 app.use('/api/attendance', attendanceRouter)

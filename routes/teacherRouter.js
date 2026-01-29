@@ -19,7 +19,7 @@ router.get('/insights',getInsights)
 
 //======================CLASSES=================
 
-//req: user_id  //res:[{id,class_name,section,total_students,class_teacher_name}]
+//res:[{id,class_name,section,total_students,class_teacher_name}]
 router.get('/assigned-classes',getTeacherClasses)
 
 module.exports=router
