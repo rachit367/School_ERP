@@ -15,7 +15,7 @@ const bullySchema = new mongoose.Schema({
     },
     bully_class:{
         type:mongoose.Schema.Types.ObjectId,
-        re:'Class'
+        ref:'Class'
     },
     description:String,
     status:{

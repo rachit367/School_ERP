@@ -7,6 +7,7 @@ const doubtModel=require('../models/doubtModel')
 const announcementModel=require('../models/announcementModel')
 const examModel=require('../models/examModel')
 const timetableModel=require('../models/timetableModel')
+const mongoose=require('mongoose')
 
 //req:  //res: [{ _id, name, role, designation, subjects, classes_assigned,announcement_allowed }]
 async function handleGetAllTeachers(school_id) {
@@ -41,9 +42,9 @@ async function handleGetAllTeachers(school_id) {
         subjects:t.teacherProfile?.subjects ?? [],
         announcement_allowed:t.teacherProfile.announcement_allowed,
         class_teacher_of:t.teacherProfile?.class_teacher_of
-        ? `${t.teacherProfile.class_teacher_of.class_name}-${t.teacherProfile.class_teacher_of.section}`
+        ? `${t.teacherProfile.class_teacher_of.class_name}${t.teacherProfile.class_teacher_of.section}`
         : '',
-        classes_assigned: (t.teacherProfile?.classes_assigned || []).map(c => `${c.class_name}-${c.section}`)
+        classes_assigned: (t.teacherProfile?.classes_assigned || []).map(c => `${c.class_name}${c.section}`)
     }))
 
 }
@@ -83,65 +84,69 @@ async function handleGetTeacher(teacher_id) {
     subjects: teacher.teacherProfile?.subjects ?? [],
     //  single class
     class_teacher_of: teacher.teacherProfile?.class_teacher_of
-        ? `${teacher.teacherProfile.class_teacher_of.class_name}-${teacher.teacherProfile.class_teacher_of.section}`
+        ? `${teacher.teacherProfile.class_teacher_of.class_name}${teacher.teacherProfile.class_teacher_of.section}`
         : '',
     //  multiple classes
     classes_assigned: (teacher.teacherProfile?.classes_assigned || [])
-        .map(c => `${c.class_name}-${c.section}`)
+        .map(c => `${c.class_name}${c.section}`)
     }
 }
 
 //req:teacher_id //res:{success}
 async function handleDeleteTeacher(teacher_id, school_id) {
-    // 1. Remove teacher from all classes
-    await classModel.updateMany(
-        {
-            $or: [
-                { class_teacher: teacher_id },
-                { teachers: teacher_id },
-                { allowed_attendance_teachers: teacher_id }
-            ]
-        },
-        {
-            $set: { class_teacher: null },
-            $pull: {
-                teachers: teacher_id,
-                allowed_attendance_teachers: teacher_id
-            }
-        }
-    );
-
-    // 2. Delete or reassign homeworks
-    await homeworkModel.deleteMany({ created_by: teacher_id });
-
-    // 3. Delete or reassign doubts
-    await doubtModel.updateMany(
-        { assigned_to: teacher_id },
-        { $set: { assigned_to: null, status: 'unassigned' } }
-    );
-
-    // 4. Delete announcements
-    await announcementModel.deleteMany({ created_by: teacher_id });
-
-    // 5. Delete exams created
-    await examModel.deleteMany({ created_by: teacher_id });
-
-    // 6. Remove from timetable
-    await timetableModel.updateMany(
-        { "periods.teacher_id": teacher_id },
-        { $set: { "periods.$[elem].teacher_id": null } },
-        { arrayFilters: [{ "elem.teacher_id": teacher_id }] }
-    );
-
-    // 7. Update school count
-    await schoolModel.findByIdAndUpdate(school_id, {
-        $inc: { total_teachers: -1 }
-    });
-
-    // 8. Finally delete the user
-    await userModel.deleteOne({ _id: teacher_id, role: 'Teacher' });
-
-    return { success: true };
+    const session = await mongoose.startSession();
+    
+    try {
+        await session.withTransaction(async () => {
+            // 1. Remove teacher from all classes
+            await classModel.updateMany(
+                {
+                    $or: [
+                        { class_teacher: teacher_id },
+                        { teachers: teacher_id },
+                        { allowed_attendance_teachers: teacher_id }
+                    ]
+                },
+                {
+                    $set: { class_teacher: null },
+                    $pull: {
+                        teachers: teacher_id,
+                        allowed_attendance_teachers: teacher_id
+                    }
+                },
+                { session }
+            );
+            // 2. Delete homeworks
+            await homeworkModel.deleteMany({ created_by: teacher_id }, { session });
+            // 3. Reassign doubts
+            await doubtModel.updateMany(
+                { assigned_to: teacher_id },
+                { $set: { assigned_to: null, status: 'unassigned' } },
+                { session }
+            );
+            // 4. Delete announcements
+            await announcementModel.deleteMany({ created_by: teacher_id }, { session });
+            // 5. Delete exams
+            await examModel.deleteMany({ created_by: teacher_id }, { session });
+            // 6. Remove from timetable
+            await timetableModel.updateMany(
+                { "periods.teacher": teacher_id },
+                { $set: { "periods.$[elem].teacher": null } },
+                { arrayFilters: [{ "elem.teacher": teacher_id }], session }
+            );
+            // 7. Update school count
+            await schoolModel.findByIdAndUpdate(
+                school_id,
+                { $inc: { total_teachers: -1 } },
+                { session }
+            );
+            // 8. Finally delete the user
+            await userModel.deleteOne({ _id: teacher_id, role: 'Teacher' }, { session });
+        });
+        return { success: true };
+    } finally {
+        await session.endSession();
+    }
 }
 
 
