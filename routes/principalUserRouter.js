@@ -33,7 +33,7 @@ router.put('/users/teachers/:id',updateTeacher)  //optional fields are there
 // ===================== CLASSES =====================
 
 // req: school_id
-// res: [{ class_name, total_students, total_sections }]
+// res: [{ class_name:total_students,total_sections ,[section]:{class_id,class_teacher_name,students}}]
 router.get('/users/classes', getClasses);
 
 // req: class_name,school_id

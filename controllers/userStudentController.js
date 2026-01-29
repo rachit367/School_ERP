@@ -9,7 +9,7 @@ const {
 } = require('../services/userStudentService');
 
 // req: school_id
-// res: [{ class_name, total_students, total_sections }]
+// res: [{ class_name:total_students,total_sections ,[section]:{class_id,class_teacher_name,students}}]
 async function getClasses(req, res, next) {
     try {
         const  school_id  = req.school_id;

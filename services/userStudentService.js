@@ -5,24 +5,61 @@ const {formatDOB}=require('../utils/formatDOB')
 const schoolModel=require('../models/schoolModel')
 const attendanceModel=require('./../models/attendanceModel')
 
-//req:school_id  //res:class_name,total_students,total_sections
-async function handleGetClasses(school_id){
-    const classes=await classModel.find({school_id:school_id})
-    .select('class_name section students')
-    .lean();
-    const payload={}
-    for (const {class_name,students} of classes){
-        if(!payload[class_name]){
-            payload[class_name]={
-                class_name,
-                total_sections:0,
-                total_students:0
+//req:school_id  // res: [{ class_name:total_students,total_sections ,[section]:{_id,class_teacher_name,students}}]
+//req:school_id  // res: [{ class_name, total_students, total_sections, [section]: { class_id, class_teacher_name, students } }]
+async function handleGetClasses(school_id) {
+    const result = await classModel.aggregate([
+        { $match: { school_id: new mongoose.Types.ObjectId(school_id) } },
+        
+        // Lookup class_teacher name
+        {
+            $lookup: {
+                from: 'users',  // collection name for userModel
+                localField: 'class_teacher',
+                foreignField: '_id',
+                as: 'teacher_info'
+            }
+        },
+        
+        // Group by class_name
+        {
+            $group: {
+                _id: '$class_name',
+                total_students: { $sum: { $size: '$students' } },
+                total_sections: { $sum: 1 },
+                sections: {
+                    $push: {
+                        section: '$section',
+                        class_id: '$_id',
+                        class_teacher_name: { $ifNull: [{ $arrayElemAt: ['$teacher_info.name', 0] }, ''] },
+                        students: { $size: '$students' }
+                    }
+                }
+            }
+        },
+        
+        // Reshape output
+        {
+            $project: {
+                _id: 0,
+                class_name: '$_id',
+                total_students: 1,
+                total_sections: 1,
+                sections: 1
             }
         }
-        payload[class_name].total_sections+=1;
-        payload[class_name].total_students+=students.length
-    }
-    return Object.values(payload);
+    ]);
+
+    // Convert sections array to object keys (A, B, C, etc.)
+    return result.map(item => {
+        const { sections, ...rest } = item;
+        const sectionObj = {};
+        for (const sec of sections) {
+            const { section, ...data } = sec;
+            sectionObj[section] = data;
+        }
+        return { ...rest, ...sectionObj };
+    });
 }
 
 //req:class_name,school_id //res:section_name,class_teacher,total_students,_id
