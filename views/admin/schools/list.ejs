@@ -81,6 +81,24 @@
                                                                     <% } %>
                                                         </div>
 
+                                                        <!-- Plan Badge -->
+                                                        <div class="mb-2">
+                                                            <% if (school.plan==='Automate' ) { %>
+                                                                <span class="badge bg-gradient"
+                                                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                                                    <%= school.plan %>
+                                                                </span>
+                                                                <% } else if (school.plan==='Autonomy' ) { %>
+                                                                    <span class="badge bg-warning text-dark">
+                                                                        <%= school.plan %>
+                                                                    </span>
+                                                                    <% } else { %>
+                                                                        <span class="badge bg-secondary">
+                                                                            <%= school.plan || 'Assist' %>
+                                                                        </span>
+                                                                        <% } %>
+                                                        </div>
+
                                                         <div class="mb-3">
                                                             <% if (school.address) { %>
                                                                 <p class="text-muted mb-1" style="font-size: 0.9rem;">

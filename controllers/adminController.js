@@ -164,10 +164,15 @@ async function showCreateSchool(req, res) {
 
 async function createSchool(req, res, next) {
     try {
-        const { name, address, principal_name, principal_phone, principal_email } = req.body;
+        const { name, address, plan, logo, principal_name, principal_phone, principal_email } = req.body;
 
         // Create the school first
-        const school = await handleCreateSchool({ name, address });
+        const school = await handleCreateSchool({
+            name,
+            address,
+            plan: plan || 'Assist',
+            logo: logo || null
+        });
 
         // Create the principal and link to school
         if (principal_name && principal_phone) {
@@ -208,8 +213,13 @@ async function showEditSchool(req, res, next) {
 
 async function updateSchool(req, res, next) {
     try {
-        const { name, address } = req.body;
-        await handleUpdateSchool(req.params.schoolId, { name, address });
+        const { name, address, plan, logo } = req.body;
+        await handleUpdateSchool(req.params.schoolId, {
+            name,
+            address,
+            plan: plan || 'Assist',
+            logo: logo || null
+        });
         res.redirect('/admin/schools?success=School updated successfully');
     } catch (error) {
         res.redirect('/admin/schools?error=' + error.message);

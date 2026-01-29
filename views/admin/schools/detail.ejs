@@ -30,37 +30,67 @@
                                 <div class="row align-items-center">
                                     <div class="col-lg-8">
                                         <div class="d-flex align-items-start">
-                                            <div class="avatar-lg bg-primary bg-opacity-10 text-primary rounded-circle me-4 d-flex align-items-center justify-content-center"
-                                                style="width: 80px; height: 80px; font-size: 2.5rem; font-weight: 700;">
-                                                <%= school.name.charAt(0).toUpperCase() %>
-                                            </div>
-                                            <div>
-                                                <h2 class="mb-2">
-                                                    <%= school.name %>
-                                                </h2>
-                                                <% if (school.address) { %>
-                                                    <p class="text-muted mb-2">
-                                                        <i class="bi bi-geo-alt me-2"></i>
-                                                        <%= school.address %>
-                                                    </p>
+                                            <% if (school.logo) { %>
+                                                <img src="<%= school.logo %>" alt="<%= school.name %> logo"
+                                                    class="rounded-circle me-4"
+                                                    style="width: 80px; height: 80px; object-fit: cover;"
+                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <div class="avatar-lg bg-primary bg-opacity-10 text-primary rounded-circle me-4 d-flex align-items-center justify-content-center"
+                                                    style="width: 80px; height: 80px; font-size: 2.5rem; font-weight: 700; display: none;">
+                                                    <%= school.name.charAt(0).toUpperCase() %>
+                                                </div>
+                                                <% } else { %>
+                                                    <div class="avatar-lg bg-primary bg-opacity-10 text-primary rounded-circle me-4 d-flex align-items-center justify-content-center"
+                                                        style="width: 80px; height: 80px; font-size: 2.5rem; font-weight: 700;">
+                                                        <%= school.name.charAt(0).toUpperCase() %>
+                                                    </div>
                                                     <% } %>
-                                                        <% if (school.principal_id) { %>
-                                                            <p class="mb-0">
-                                                                <strong><i
-                                                                        class="bi bi-person-badge me-2"></i>Principal:</strong>
-                                                                <%= school.principal_id.name %>
-                                                                    <% if (school.principal_id.phone) { %>
-                                                                        <span class="text-muted">(<%=
-                                                                                school.principal_id.phone %>)</span>
-                                                                        <% } %>
-                                                            </p>
-                                                            <% } else { %>
-                                                                <p class="mb-0 text-warning">
-                                                                    <i class="bi bi-exclamation-circle me-2"></i>No
-                                                                    Principal Assigned
+                                                        <div>
+                                                            <div class="d-flex align-items-center mb-2">
+                                                                <h2 class="mb-0 me-3">
+                                                                    <%= school.name %>
+                                                                </h2>
+                                                                <!-- Plan Badge -->
+                                                                <% if (school.plan==='Automate' ) { %>
+                                                                    <span class="badge bg-gradient"
+                                                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                                                        <%= school.plan %>
+                                                                    </span>
+                                                                    <% } else if (school.plan==='Autonomy' ) { %>
+                                                                        <span class="badge bg-warning text-dark">
+                                                                            <%= school.plan %>
+                                                                        </span>
+                                                                        <% } else { %>
+                                                                            <span class="badge bg-secondary">
+                                                                                <%= school.plan || 'Assist' %>
+                                                                            </span>
+                                                                            <% } %>
+                                                            </div>
+                                                            <% if (school.address) { %>
+                                                                <p class="text-muted mb-2">
+                                                                    <i class="bi bi-geo-alt me-2"></i>
+                                                                    <%= school.address %>
                                                                 </p>
                                                                 <% } %>
-                                            </div>
+                                                                    <% if (school.principal_id) { %>
+                                                                        <p class="mb-0">
+                                                                            <strong><i
+                                                                                    class="bi bi-person-badge me-2"></i>Principal:</strong>
+                                                                            <%= school.principal_id.name %>
+                                                                                <% if (school.principal_id.phone) { %>
+                                                                                    <span class="text-muted">(<%=
+                                                                                            school.principal_id.phone %>
+                                                                                            )</span>
+                                                                                    <% } %>
+                                                                        </p>
+                                                                        <% } else { %>
+                                                                            <p class="mb-0 text-warning">
+                                                                                <i
+                                                                                    class="bi bi-exclamation-circle me-2"></i>No
+                                                                                Principal Assigned
+                                                                            </p>
+                                                                            <% } %>
+                                                        </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
@@ -283,7 +313,7 @@
                                         <h5 class="mb-2 text-danger">Danger Zone</h5>
                                         <p class="text-muted mb-3">Delete this school and all its data</p>
                                         <form action="/admin/schools/<%= school._id %>/delete" method="POST"
-                                            onsubmit="return confirm('⚠️ WARNING: This will permanently delete <%= school.name %> and ALL associated data (students, teachers, classes, attendance, etc.). This action cannot be undone! Are you absolutely sure?');">
+                                            onsubmit="return confirm('WARNING: This will permanently delete <%= school.name %> and ALL associated data (students, teachers, classes, attendance, etc.). This action cannot be undone. Are you absolutely sure?');">
                                             <button type="submit" class="btn btn-danger">
                                                 <i class="bi bi-trash me-2"></i>Delete School
                                             </button>

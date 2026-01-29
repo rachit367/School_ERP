@@ -87,8 +87,7 @@ async function handleGetTeacher(teacher_id) {
 }
 
 //req:teacher_id //res:{success}
-async function handleDeleteTeacher(teacher_id,school_id) {
-    async function handleDeleteTeacher(teacher_id, school_id) {
+async function handleDeleteTeacher(teacher_id, school_id) {
     // 1. Remove teacher from all classes
     await classModel.updateMany(
         {
@@ -139,7 +138,7 @@ async function handleDeleteTeacher(teacher_id,school_id) {
 
     return { success: true };
 }
-}
+
 
 //req:name,email,role,employee_id,class_teacher_of,classes_assigned,subjects  //res:{success,message}
 async function handleCreateTeacher(name,email,phone,role,employee_id,class_teacher_of,subjects,school_id){
