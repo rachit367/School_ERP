@@ -1,4 +1,5 @@
 const classModel=require('../models/classModel')
+const mongoose=require('mongoose')
 
 async function canMarkAttendance(user_id, class_id) {
     return !!await classModel.exists({
