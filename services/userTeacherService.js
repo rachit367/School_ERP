@@ -8,6 +8,9 @@ const announcementModel=require('../models/announcementModel')
 const examModel=require('../models/examModel')
 const timetableModel=require('../models/timetableModel')
 const mongoose=require('mongoose')
+const leaveModel = require('../models/leaveModel')
+const ptmModel = require('../models/ptmModel')
+const subjectModel = require('../models/subjectModel')
 
 //req:  //res: [{ _id, name, role, designation, subjects, classes_assigned,announcement_allowed }]
 async function handleGetAllTeachers(school_id) {
@@ -95,20 +98,19 @@ async function handleGetTeacher(teacher_id) {
 //req:teacher_id //res:{success}
 async function handleDeleteTeacher(teacher_id, school_id) {
     const session = await mongoose.startSession();
-    
+
     try {
         await session.withTransaction(async () => {
-            // 1. Remove teacher from all classes
+
+            // Remove from arrays
             await classModel.updateMany(
                 {
                     $or: [
-                        { class_teacher: teacher_id },
                         { teachers: teacher_id },
                         { allowed_attendance_teachers: teacher_id }
                     ]
                 },
                 {
-                    $set: { class_teacher: null },
                     $pull: {
                         teachers: teacher_id,
                         allowed_attendance_teachers: teacher_id
@@ -116,38 +118,80 @@ async function handleDeleteTeacher(teacher_id, school_id) {
                 },
                 { session }
             );
-            // 2. Delete homeworks
-            await homeworkModel.deleteMany({ created_by: teacher_id }, { session });
-            // 3. Reassign doubts
-            await doubtModel.updateMany(
-                { assigned_to: teacher_id },
-                { $set: { assigned_to: null, status: 'unassigned' } },
+
+            // Remove as class teacher
+            await classModel.updateMany(
+                { class_teacher: teacher_id },
+                { $set: { class_teacher: null } },
                 { session }
             );
-            // 4. Delete announcements
-            await announcementModel.deleteMany({ created_by: teacher_id }, { session });
-            // 5. Delete exams
-            await examModel.deleteMany({ created_by: teacher_id }, { session });
-            // 6. Remove from timetable
+
+            // Delete related data
+            await homeworkModel.deleteMany(
+                { created_by: teacher_id },
+                { session }
+            );
+
+            await announcementModel.deleteMany(
+                { created_by: teacher_id },
+                { session }
+            );
+
+            await leaveModel.updateMany(
+                { class_teacher: teacher_id },
+                { $set: { class_teacher: null } },
+                { session }
+            );
+
+            await ptmModel.deleteMany(
+                { teacher_id },
+                { session }
+            );
+
+            await subjectModel.deleteMany(
+                { teacher_id },
+                { session }
+            );
+
             await timetableModel.updateMany(
                 { "periods.teacher": teacher_id },
                 { $set: { "periods.$[elem].teacher": null } },
-                { arrayFilters: [{ "elem.teacher": teacher_id }], session }
+                {
+                    arrayFilters: [{ "elem.teacher": teacher_id }],
+                    session
+                }
             );
-            // 7. Update school count
-            await schoolModel.findByIdAndUpdate(
-                school_id,
+
+            await schoolModel.updateOne(
+                { _id: school_id, total_teachers: { $gt: 0 } },
                 { $inc: { total_teachers: -1 } },
                 { session }
             );
-            // 8. Finally delete the user
-            await userModel.deleteOne({ _id: teacher_id, role: 'Teacher' }, { session });
+
+            await userModel.deleteOne(
+                { _id: teacher_id, role: "Teacher" },
+                { session }
+            );
         });
+
         return { success: true };
+
+    } catch (error) {
+
+        console.error("Delete Teacher Error:", error);
+
+        return {
+            success: false,
+            message: error.message
+        };
+
     } finally {
+
         await session.endSession();
     }
 }
+
+
 
 
 //req:name,email,role,employee_id,class_teacher_of,classes_assigned,subjects  //res:{success,message}

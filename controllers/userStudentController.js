@@ -5,7 +5,6 @@ const {
     handleGetStudentDetails,
     handleAddStudent,
     handleDeleteStudent,
-    handleTransferStudent
 } = require('../services/userStudentService');
 
 // req: school_id
