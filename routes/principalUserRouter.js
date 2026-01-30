@@ -60,9 +60,9 @@ router.post('/users/students', addStudent);
 // res: { success }
 router.delete('/users/students/:student_id', deleteStudent);
 
-// req: student_id, section
+// req: student_id, class_id(in which  student to be transfered)
 // res: { success }
-router.patch('/users/students/:student_id/transfer', transferStudent);
+router.patch('/users/students/:student_id/transfer', transferStudent); 
 
 
 module.exports=router

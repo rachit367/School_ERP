@@ -9,63 +9,71 @@ const doubtModel=require('../models/doubtModel')
 const leaveModel=require('../models/leaveModel')
 const ptmModel=require('../models/ptmModel')
 const bullyModel=require('../models/bullyModel')
-const mongoose=require('mongoose')
+const mongoose=require('mongoose');
+const examModel = require('../models/examModel');
 
 
 //req:school_id  // res: [{ class_name, total_students, total_sections, [section]: { class_id, class_teacher_name, students } }]
 async function handleGetClasses(school_id) {
-    const result = await classModel.aggregate([
-        { $match: { school_id: new mongoose.Types.ObjectId(school_id) } },
-        
-        // Lookup class_teacher name
-        {
-            $lookup: {
-                from: 'users',  // collection name for userModel
-                localField: 'class_teacher',
-                foreignField: '_id',
-                as: 'teacher_info'
-            }
-        },
-        
-        // Group by class_name
-        {
-            $group: {
-                _id: '$class_name',
-                total_students: { $sum: { $size: '$students' } },
-                total_sections: { $sum: 1 },
-                sections: {
-                    $push: {
-                        section: '$section',
-                        class_id: '$_id',
-                        class_teacher_name: { $ifNull: [{ $arrayElemAt: ['$teacher_info.name', 0] }, ''] },
-                        students: { $size: '$students' }
-                    }
-                }
-            }
-        },
-        
-        // Reshape output
-        {
-            $project: {
-                _id: 0,
-                class_name: '$_id',
-                total_students: 1,
-                total_sections: 1,
-                sections: 1
-            }
-        }
-    ]);
+  const classes = await classModel.aggregate([
+    {
+      $match: {
+        school_id: new mongoose.Types.ObjectId(school_id)
+      }
+    },
 
-    // Convert sections array to object keys (A, B, C, etc.)
-    return result.map(item => {
-        const { sections, ...rest } = item;
-        const sectionObj = {};
-        for (const sec of sections) {
-            const { section, ...data } = sec;
-            sectionObj[section] = data;
+    // Join class teacher info
+    {
+      $lookup: {
+        from: "users",
+        localField: "class_teacher",
+        foreignField: "_id",
+        as: "teacher_info"
+      }
+    },
+
+    //  Add teacher name + student count per section
+    {
+      $addFields: {
+        class_teacher_name: {
+          $ifNull: [{ $arrayElemAt: ["$teacher_info.name", 0] }, ""]
+        },
+        student_count: { $size: "$students" }
+      }
+    },
+
+    // Group by class name (like 10, 9, etc.)
+    {
+      $group: {
+        _id: "$class_name",
+        total_students: { $sum: "$student_count" },
+        total_sections: { $sum: 1 },
+        sections: {
+          $push: {
+            name: "$section",
+            class_id: "$_id",
+            class_teacher_name: "$class_teacher_name",
+            students: "$student_count"
+          }
         }
-        return { ...rest, ...sectionObj };
-    });
+      }
+    },
+
+
+    {
+      $project: {
+        _id: 0,
+        class_name: "$_id",
+        total_students: 1,
+        total_sections: 1,
+        sections: 1
+      }
+    },
+
+    { $sort: { class_name: 1 } }
+  ]);
+
+  return classes;
 }
 
 //req:class_name,school_id //res:section_name,class_teacher,total_students,_id
@@ -252,12 +260,65 @@ async function handleDeleteStudent(student_id){
     }
 }
 
+async function handleTransferStudent(student_id,class_id,school_id){
+    const session=await mongoose.startSession()
+    try{
+        session.startTransaction()
+        const student=await userModel.findOne({
+            school_id,
+            _id:student_id
+        },null,{session})
 
+        
+        if (!student) throw new Error("Student not found");
+
+        const oldClassId=student.studentProfile.class_id
+
+        await userModel.updateOne(
+            { _id: student_id },
+            { $set: { "studentProfile.class_id": class_id } },
+            { session }
+        );
+
+        await classModel.bulkWrite([
+            {
+                updateOne:{
+                    filter:{school_id:school_id,_id:oldClassId},
+                    update:{$pull:{students:student._id}}
+                }
+            },
+            {
+                updateOne:{
+                    filter:{school_id,_id:class_id},
+                    update:{$addToSet:{students:student._id}}
+                }
+            }
+        ],{session})
+
+
+        await attendanceModel.updateMany({
+            student_id:student._id,
+            class_id:oldClassId
+        },{
+            $set:{class_id:class_id}
+        },{session})
+
+        await session.commitTransaction()
+        session.endSession()
+        return {success:true}
+    }catch(err){
+        await session.abortTransaction()
+        session.endSession()
+        throw err
+    }
+}
+    
 module.exports={
     handleAddStudent,
     handleDeleteStudent,
     handleGetClasses,
     handleGetSections,
     handleGetStudentDetails,
-    handleGetStudentsInSection
+    handleGetStudentsInSection,
+    handleTransferStudent
 }

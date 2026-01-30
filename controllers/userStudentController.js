@@ -5,6 +5,7 @@ const {
     handleGetStudentDetails,
     handleAddStudent,
     handleDeleteStudent,
+    handleTransferStudent
 } = require('../services/userStudentService');
 
 // req: school_id
@@ -121,10 +122,10 @@ async function deleteStudent(req, res, next) {
 // res: success
 async function transferStudent(req, res, next) {
     try {
-        const { student_id } = req.params;
-        const { section } = req.body;
-
-        const result = await handleTransferStudent(student_id, section);
+        const student_id  = req.params.student_id;
+        const class_id = req.body.class_id;
+        const school_id=req.school_id
+        const result = await handleTransferStudent(student_id, class_id,school_id);
 
         return res.status(200).json(result);
     } catch (err) {
