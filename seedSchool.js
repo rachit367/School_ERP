@@ -212,13 +212,19 @@ async function createClassesAndAcademic(school, classCount, sections, teachers) 
             }
 
             // Create Timetable (6 days, 8 periods each)
+            const formatTime = (hour, minute) => {
+                const period = hour >= 12 ? 'PM' : 'AM'
+                const h12 = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour)
+                return `${h12}:${String(minute).padStart(2, '0')} ${period}`
+            }
             for (const day of days) {
                 const periods = []
                 for (let p = 1; p <= 8; p++) {
                     const subject = classSubjects[(p - 1) % classSubjects.length]
+                    const startHour = 7 + p  // 8, 9, 10, 11, 12, 13, 14, 15
                     periods.push({
-                        start: `${7 + p}:00`,
-                        end: `${7 + p}:45`,
+                        start: formatTime(startHour, 0),
+                        end: formatTime(startHour, 45),
                         subject: subject.name,
                         location: `Room ${c}${sec}`,
                         teacher: subject.teacher_id
@@ -324,12 +330,15 @@ async function createStudentsAndRecords(school, classes, teachers) {
             // Leave Applications (20% of students)
             if (Math.random() > 0.8) {
                 const leaveReasons = ["Sick Leave", "Family Function", "Medical Appointment", "Personal Work"]
+                const leaveStart = getRandomDate(10)
+                const leaveEnd = new Date(leaveStart)
+                leaveEnd.setDate(leaveEnd.getDate() + Math.floor(Math.random() * 3) + 1) // 1-3 days after start
                 await Leave.create({
                     student: s._id,
                     school_id: school._id,
                     reason: getRandomItem(leaveReasons),
-                    start_date: getRandomDate(10),
-                    end_date: getRandomDate(8),
+                    start_date: leaveStart,
+                    end_date: leaveEnd,
                     status: getRandomItem(['Pending', 'Approved', 'Rejected']),
                     class_teacher: cls.class_teacher
                 })
@@ -510,8 +519,7 @@ async function seed() {
             name: config.name,
             address: config.address,
             plan: config.plan,
-            logo: config.logo,
-            isActive: true
+            logo: config.logo
         })
 
         await createSchoolStaff(school)
