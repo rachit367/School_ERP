@@ -104,7 +104,7 @@ async function createTeachers(school, totalClasses) {
     const subjectsList = ["Mathematics", "Science", "English", "Hindi", "Social Studies", "Physics", "Chemistry", "Biology", "Computer Science", "Physical Education", "Art", "Music"]
     const designations = ["ST", "Mentor"]
 
-    // Class Teachers (one per class)
+    // Class Teachers (one per class) - initially ST, will become Mentor when assigned
     for (let i = 1; i <= totalClasses; i++) {
         teachers.push(await User.create({
             name: `${school.name.split(' ')[0]} Teacher ${i}`,
@@ -115,7 +115,7 @@ async function createTeachers(school, totalClasses) {
             date_of_birth: new Date(1985 + Math.floor(i / 5), i % 12, 1 + i),
             teacherProfile: {
                 employee_id: `EMP-${school.name.substring(0, 2).toUpperCase()}-${String(i).padStart(3, '0')}`,
-                designation: getRandomItem(designations),
+                designation: "ST",
                 subjects: [getRandomItem(subjectsList), getRandomItem(subjectsList)],
                 classes_assigned: [],
                 announcement_allowed: i % 3 === 0
@@ -123,7 +123,7 @@ async function createTeachers(school, totalClasses) {
         }))
     }
 
-    // Subject Specialists (extra teachers)
+    // Subject Specialists (extra teachers) - always ST since not class teachers
     const specialists = Math.ceil(totalClasses / 3)
     for (let i = 1; i <= specialists; i++) {
         teachers.push(await User.create({
@@ -135,7 +135,7 @@ async function createTeachers(school, totalClasses) {
             date_of_birth: new Date(1982 + i, 5, 15),
             teacherProfile: {
                 employee_id: `SPL-${school.name.substring(0, 2).toUpperCase()}-${String(i).padStart(3, '0')}`,
-                designation: "Mentor",
+                designation: "ST",
                 subjects: [subjectsList[i % subjectsList.length]],
                 announcement_allowed: true
             }
@@ -173,9 +173,12 @@ async function createClassesAndAcademic(school, classCount, sections, teachers) 
             })
             classes.push(cls)
 
-            // Sync Teacher Profile
+            // Sync Teacher Profile - set as class teacher and update designation to Mentor
             await User.findByIdAndUpdate(classTeacher._id, {
-                $set: { "teacherProfile.class_teacher_of": cls._id },
+                $set: {
+                    "teacherProfile.class_teacher_of": cls._id,
+                    "teacherProfile.designation": "Mentor"
+                },
                 $addToSet: { "teacherProfile.classes_assigned": cls._id }
             })
 
