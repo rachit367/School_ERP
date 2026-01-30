@@ -90,7 +90,7 @@ async function getStudentAttendance(req, res, next) {
 
 async function getOverallAttendance(req,res,next) {
     try{
-        const student_id=req.user_id
+        const student_id=req.query.student_id
         const school_id=req.school_id
         const data=await handleGetOverallAttendance(school_id,student_id)
         return res.status(200).json(data)

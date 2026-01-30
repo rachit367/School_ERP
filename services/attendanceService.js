@@ -359,7 +359,9 @@ async function handleGetStudentAttendance(from_date,to_date,student_id){  //date
 async function handleGetOverallAttendance(school_id,student_id) {
     const stats=await attendanceModel.aggregate([
     {
-        $match:{student_id}
+        $match:{
+            student_id: new mongoose.Types.ObjectId(student_id)
+        }
     },
     {
         $group:{
