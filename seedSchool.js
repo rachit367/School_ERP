@@ -285,20 +285,21 @@ async function createClassesAndAcademic(school, classCount, sections, teachers) 
 }
 
 // ---------------------------------------------------------
-// 4. Create Students & All Records
+// 4. Create Students & All Records (OPTIMIZED with bulk operations)
 // ---------------------------------------------------------
 async function createStudentsAndRecords(school, classes, teachers) {
     const allStudents = []
     const studentsPerClass = 30
+    const leaveReasons = ["Sick Leave", "Family Function", "Medical Appointment", "Personal Work"]
 
     for (const cls of classes) {
-        const classStudents = []
         const exams = await Exam.find({ class_id: cls._id })
         const subjects = await Subject.find({ class_id: cls._id })
 
-        // Create Students
+        // Prepare student data for bulk insert
+        const studentDocs = []
         for (let i = 1; i <= studentsPerClass; i++) {
-            const s = await User.create({
+            studentDocs.push({
                 name: `Student ${cls.class_name}${cls.section}-${String(i).padStart(2, '0')}`,
                 phone: randomPhone(8000000000),
                 email: `student.${cls.class_name}${cls.section.toLowerCase()}${i}@${school.name.split(' ')[0].toLowerCase()}.edu`,
@@ -318,25 +319,38 @@ async function createStudentsAndRecords(school, classes, teachers) {
                     total_absents: 0
                 }
             })
-            classStudents.push(s)
+        }
 
-            // Create Marks for each exam
+        // Bulk insert students
+        const classStudents = await User.insertMany(studentDocs)
+
+        // Prepare marks for bulk insert
+        const marksDocs = []
+        for (const s of classStudents) {
             for (const exam of exams) {
-                await Marks.create({
+                marksDocs.push({
                     school_id: school._id,
                     exam_id: exam._id,
                     student_id: s._id,
                     marks_obtained: Math.floor(Math.random() * (exam.max_marks * 0.4)) + (exam.max_marks * 0.5)
                 })
             }
+        }
+        if (marksDocs.length > 0) await Marks.insertMany(marksDocs)
 
+        // Prepare leaves, bullies, doubts, ptm for bulk insert
+        const leaveDocs = []
+        const bullyDocs = []
+        const doubtDocs = []
+        const ptmDocs = []
+
+        for (const s of classStudents) {
             // Leave Applications (20% of students)
             if (Math.random() > 0.8) {
-                const leaveReasons = ["Sick Leave", "Family Function", "Medical Appointment", "Personal Work"]
                 const leaveStart = getRandomDate(10)
                 const leaveEnd = new Date(leaveStart)
-                leaveEnd.setDate(leaveEnd.getDate() + Math.floor(Math.random() * 3) + 1) // 1-3 days after start
-                await Leave.create({
+                leaveEnd.setDate(leaveEnd.getDate() + Math.floor(Math.random() * 3) + 1)
+                leaveDocs.push({
                     student: s._id,
                     school_id: school._id,
                     reason: getRandomItem(leaveReasons),
@@ -349,7 +363,7 @@ async function createStudentsAndRecords(school, classes, teachers) {
 
             // Bully Reports (3% of students)
             if (Math.random() > 0.97) {
-                await Bully.create({
+                bullyDocs.push({
                     school_id: school._id,
                     reported_by: s._id,
                     bully_name: "Anonymous Student",
@@ -362,7 +376,7 @@ async function createStudentsAndRecords(school, classes, teachers) {
             // Doubts (15% of students)
             if (Math.random() > 0.85 && subjects.length > 0) {
                 const randomSubject = getRandomItem(subjects)
-                await Doubt.create({
+                doubtDocs.push({
                     school_id: school._id,
                     student: s._id,
                     class_id: cls._id,
@@ -379,7 +393,7 @@ async function createStudentsAndRecords(school, classes, teachers) {
 
             // PTM Meetings (10% of students)
             if (Math.random() > 0.9) {
-                await Ptm.create({
+                ptmDocs.push({
                     teacher_id: cls.class_teacher,
                     student_id: s._id,
                     school_id: school._id,
@@ -391,10 +405,26 @@ async function createStudentsAndRecords(school, classes, teachers) {
             }
         }
 
+        // Bulk insert all related records
+        if (leaveDocs.length > 0) await Leave.insertMany(leaveDocs)
+        if (bullyDocs.length > 0) await Bully.insertMany(bullyDocs)
+        if (doubtDocs.length > 0) await Doubt.insertMany(doubtDocs)
+        if (ptmDocs.length > 0) await Ptm.insertMany(ptmDocs)
+
+        // Update class with student IDs
         await Class.findByIdAndUpdate(cls._id, { $push: { students: { $each: classStudents.map(s => s._id) } } })
         allStudents.push(...classStudents)
 
-        // Attendance & Summary (Last 15 working days)
+        // Attendance & Summary (Last 15 working days) - OPTIMIZED
+        const attendanceDocs = []
+        const summaryDocs = []
+        const studentAttendanceStats = {} // Track presents/absents per student
+
+        // Initialize stats for all students
+        for (const s of classStudents) {
+            studentAttendanceStats[s._id.toString()] = { presents: 0, absents: 0 }
+        }
+
         for (let d = 0; d < 15; d++) {
             const date = new Date()
             date.setDate(date.getDate() - d)
@@ -411,31 +441,29 @@ async function createStudentsAndRecords(school, classes, teachers) {
                 if (rand > 0.92) status = 'A'
                 else if (rand > 0.88) status = 'L'
 
-                if (status === 'P') presentCount++
-                else if (status === 'A') absentCount++
-                else lateCount++
+                if (status === 'P') {
+                    presentCount++
+                    studentAttendanceStats[s._id.toString()].presents++
+                } else if (status === 'A') {
+                    absentCount++
+                    studentAttendanceStats[s._id.toString()].absents++
+                } else {
+                    lateCount++
+                }
 
-                await Attendance.create({
+                attendanceDocs.push({
                     school_id: school._id,
                     date: date,
                     student_id: s._id,
                     class_id: cls._id,
                     status: status
                 })
-
-                // Update student attendance stats
-                if (status === 'P') {
-                    await User.findByIdAndUpdate(s._id, { $inc: { "studentProfile.total_presents": 1 } })
-                } else if (status === 'A') {
-                    await User.findByIdAndUpdate(s._id, { $inc: { "studentProfile.total_absents": 1 } })
-                }
             }
 
-            // Class Attendance Summary
+            // Prepare summary
             const total = classStudents.length
             const attendance_percent = total === 0 ? 0 : Number(((presentCount / total) * 100).toFixed(2))
-
-            await ClassAttendanceSummary.create({
+            summaryDocs.push({
                 school_id: school._id,
                 class_id: cls._id,
                 section: cls.section,
@@ -446,6 +474,24 @@ async function createStudentsAndRecords(school, classes, teachers) {
                 attendance_percent
             })
         }
+
+        // Bulk insert attendance and summaries
+        if (attendanceDocs.length > 0) await Attendance.insertMany(attendanceDocs)
+        if (summaryDocs.length > 0) await ClassAttendanceSummary.insertMany(summaryDocs)
+
+        // Bulk update student attendance stats
+        const studentUpdateOps = classStudents.map(s => ({
+            updateOne: {
+                filter: { _id: s._id },
+                update: {
+                    $set: {
+                        "studentProfile.total_presents": studentAttendanceStats[s._id.toString()].presents,
+                        "studentProfile.total_absents": studentAttendanceStats[s._id.toString()].absents
+                    }
+                }
+            }
+        }))
+        if (studentUpdateOps.length > 0) await User.bulkWrite(studentUpdateOps)
     }
 
     await School.findByIdAndUpdate(school._id, { total_students: allStudents.length })
