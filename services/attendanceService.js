@@ -249,16 +249,21 @@ async function handleGetClassAttendance(class_id,school_id){
             today_attendance: todayMap[s._id.toString()] ?? 'Not Marked'
         });
     }
-
+    
+    const totalStudents = classDoc.students.length;
     const classAttendance =
         totalPresents + totalAbsents === 0
             ? 0
             : Number(((totalPresents / (totalPresents + totalAbsents)) * 100).toFixed(2));
-
+    
+    const todays_percentage = totalStudents === 0
+  ? 0
+  : Number(((todayPresent / totalStudents) * 100).toFixed(2));
     return {
-        class_attendance_percentage: classAttendance,
+        total_class_attendance_percentage: classAttendance, //total class attendance
         total_present: todayPresent,
         total_absent: todayAbsent,
+        todays_percentage,
         students: studentsAttendance
     };
 }
