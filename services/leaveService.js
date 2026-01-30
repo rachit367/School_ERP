@@ -37,6 +37,7 @@ async function handleGetLeaveRequest(school_id, teacher_id) {
     })
 
     return requests.map(r => ({
+        _id:r._id,
         student_name: r.student?.name || 'N/A',
         start_date: r.start_date,
         end_date: r.end_date,

@@ -13,7 +13,7 @@ const {isTeacher}=require('./../middlewares/isTeacher')
 router.use(authenticateToken)
 
 //req:school_id,user_id  //res:[{_id,status,reason,start_date,end_date}]
-router.get('/history',getLeaveHistory)
+router.get('/history',getLeaveHistory)  //student only
 
 //req:school_id,user_id  //res:[{_id,student_name,start_date,end_date,reason,status}]
 router.get('/requests',isTeacher,getLeaveRequests)
