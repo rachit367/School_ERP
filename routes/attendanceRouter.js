@@ -23,7 +23,7 @@ router.get('/overall',getOverallAttendance)   //for student
 //req:class_id // res: allowed(true or false)
 router.get('/allowed-class/:id',checkAllowedClass)
 
-// req: class_id  // res: {class_attendance_percentage,total_present,total_absent,students:[{student_id,name,roll_number,attendance_percentage,today_attendance}]}
+// req: class_id  // res: {total_class_attendance_percentage,total_present,total_absent,todays_percentage,students:[{student_id,name,roll_number,attendance_percentage,today_attendance}]}
 router.get('/class/:classid',getClassAttendance)
 
 //req:{class_id,attendance:[student_id,status]}  //res:success,message     status:P,A only

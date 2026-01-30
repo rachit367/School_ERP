@@ -193,7 +193,7 @@ async function handlesaveDailyAttendance(user_id, class_id, attendance) {
     }
 }
 
-// req: class_id  // res: {class_attendance_percentage,total_present,total_absent,students:[{student_id,name,roll_number,attendance_percentage,today_attendance}]}
+// req: class_id  // res: {total_class_attendance_percentage,total_present,total_absent,todays_percentage,students:[{student_id,name,roll_number,attendance_percentage,today_attendance}]}
 async function handleGetClassAttendance(class_id,school_id){
 
     const today = new Date();
