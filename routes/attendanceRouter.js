@@ -35,6 +35,6 @@ router.post('/substitute',assignSubstituteTeacher)  //only class teacehr can ass
 //req:school_id,substitute_id   //res:success,message
 router.delete('/substitute',removeSubstituteTeacher) //only class teacehr can remove substitute teacher 
 
-s
+
 
 module.exports=router
