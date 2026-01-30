@@ -3,6 +3,15 @@ const timetableModel=require('./../models/timetableModel');
 const userModel=require('./../models/userModel');
 const {timeToMin}=require('./../utils/timeToMin')
 
+const dayOrder = {
+  Monday: 1,
+  Tuesday: 2,
+  Wednesday: 3,
+  Thursday: 4,
+  Friday: 5,
+  Saturday: 6,
+  Sunday: 7
+};
 
 //req:user_id,class_id,school_id  //res:success
 async function handleAllowedEditTimetable(user_id,class_id,school_id){
@@ -113,7 +122,7 @@ async function handleStudentTimetable(class_id,school_id){
             subject:p.subject
         }))
         .sort((a,b) => timeToMin(a.start) - timeToMin(b.start))
-    }))
+    })).sort((a, b) => dayOrder[a.day] - dayOrder[b.day]);
     return payload
 }
 
@@ -133,6 +142,7 @@ async function handleTeacherTimetable(teacher_id,school_id){
             map[t.day].push({
             _id:p._id,
               class_name: t.class_id?.class_name || '',
+              class_id:t.class_id._id,
               section: t.class_id?.section || '',
               subject: p.subject,
               start: p.start,
@@ -146,7 +156,7 @@ async function handleTeacherTimetable(teacher_id,school_id){
     const payload = Object.keys(map).map(day => ({
         day,
         periods: map[day].sort((a,b) => timeToMin(a.start) - timeToMin(b.start))
-    }))
+    })).sort((a, b) => dayOrder[a.day] - dayOrder[b.day]);
 
     return payload
 
