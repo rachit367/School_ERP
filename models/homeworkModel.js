@@ -6,6 +6,10 @@ const homeworkSchema = new mongoose.Schema({
     class_id:{ type: mongoose.Schema.Types.ObjectId, ref: "Class" ,required:true},
     topic:String,
     description:String,
+    subject:{
+        type:String,
+        set: v => v.replace(/\b\w/g, c => c.toUpperCase())
+    },
     attachments:[{
         name:String,
         url:String

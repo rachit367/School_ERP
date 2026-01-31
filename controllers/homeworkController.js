@@ -5,10 +5,10 @@ const {
     handleGetClassHomework,
     handleGetSubjectHomeworks,
     handleSubmitHomework,
-    handleGetStudentHomeworkDetails
+    handleGetStudentHomeworkDetails,
+    handleGetPendingHomeworksCount
 }=require('./../services/homeworkService')
 
-// req:  // res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
 async function getAllHomeworks(req,res,next){
     try{
         const user_id=req.user_id
@@ -20,7 +20,6 @@ async function getAllHomeworks(req,res,next){
     }
 }
 
-// req: homework_id  // res: { id, topic, description, class_name, section, due_date, total_students, total_submission, submitted_by[] }
 async function getHomeworkDetails(req,res,next) {
     try{
         const id=req.params.id
@@ -31,25 +30,25 @@ async function getHomeworkDetails(req,res,next) {
     }
 }
 
-//req: Class,topic,description,due_date  //res:success,message
+
 async function postHomework(req,res,next){
     try{
         const {
             Class,
             topic,
             description,
-            due_date
+            due_date,
+            subject
         }=req.body
         const school_id=req.school_id
         const user_id=req.user_id
-        const result=await handlePostHomework(user_id,school_id,Class,topic,description,due_date)
+        const result=await handlePostHomework(user_id,school_id,Class,topic,description,due_date,subject)
         return res.status(200).json(result)
     }catch(err){
         next(err)
     }
 }
 
-//req:classId //res:res: [{ id, topic, description, class_name, section, due_date, total_students, total_submission }]
 async function getClassHomework(req,res,next) {
     try{
         const class_id=req.params.classid
@@ -87,6 +86,18 @@ async function getStudentHomeworkDetails(req, res, next){
   }
 };
 
+async function getPendingHomeworksCount(req, res, next){
+  try {
+    const school_id=req.school_id
+    const student_id=req.user_id
+    const class_id=req.query.class_id
+    const data=await handleGetPendingHomeworksCount(school_id,class_id,student_id)
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+};
+
 async function submitHomework(req, res, next){
   try {
     const data=await handleSubmitHomework()
@@ -104,5 +115,6 @@ module.exports={
     getSubjectHomeworks,
     postHomework,
     getStudentHomeworkDetails,
-    submitHomework
+    submitHomework,
+    getPendingHomeworksCount
 }

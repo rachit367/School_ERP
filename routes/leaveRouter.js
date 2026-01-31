@@ -12,8 +12,9 @@ const {isTeacher}=require('./../middlewares/isTeacher')
 
 router.use(authenticateToken)
 
-//req:school_id,user_id  //res:[{_id,status,reason,start_date,end_date}]
-router.get('/history',getLeaveHistory)  //student only
+//============TEACHER===============
+
+
 
 //req:school_id,user_id  //res:[{_id,student_name,start_date,end_date,reason,status}]
 router.get('/requests',isTeacher,getLeaveRequests)
@@ -24,7 +25,12 @@ router.patch('/approve/:reqid',isTeacher,approveLeave)
 //req:req_id //res:success
 router.patch('/reject/:reqid',isTeacher,rejectLeave)
 
+//============STUDENT===============
+
 //req:school_id,student_id,class_id,reason,start_date,end_date  //res:success
-router.post('/request',MakeRequest)
+router.post('/request',MakeRequest)  
+
+//req:school_id,user_id  //res:[{_id,status,reason,start_date,end_date}]
+router.get('/history',getLeaveHistory)  
 
 module.exports=router

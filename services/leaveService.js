@@ -7,7 +7,19 @@ async function handleGetLeaveHistory(school_id,student_id) {  //student section
     .select('status reason start_date end_date')
     .sort({start_date:-1})
     .lean()
-    return {history}
+
+    const order = { Pending: 1, Approved: 2, Rejected: 3 };
+    history.sort((a, b) => {
+        // 1. Status priority
+        if (order[a.status] !== order[b.status]) {
+            return order[a.status] - order[b.status];
+        }
+
+        // 2. Date inside same status (latest first)
+        return new Date(b.start_date) - new Date(a.start_date);
+    });
+
+    return history
 }
 
 //req:school_id,user_id  //res:[{_id,student_name,start_date,end_date,reason,status}]

@@ -13,7 +13,6 @@ const { capitalizeFullName, normalizePhone } = require('../utils/loginUtils');
 async function sendOtpService(phone, name) {
   const normalizedPhone = normalizePhone(phone);
   const capitalName = capitalizeFullName(name);
-
   const user = await userModel.findOne({ name: capitalName, phone: normalizedPhone });
   if (!user) return { statusCode: 401, message: "User not found" };
 

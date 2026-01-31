@@ -24,7 +24,7 @@ async function updateDoubt(req, res, next){
     const reply=req.body.reply ?? ''
     const doubt_id=req.params.id
     const result=await handleUpdateDoubt(doubt_id,reply)
-    res.status(200).json({result});
+    res.status(200).json(result);
 
   } catch (err) {
     next(err);
