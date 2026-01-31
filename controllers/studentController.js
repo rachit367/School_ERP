@@ -1,6 +1,7 @@
 const{
     handleGetAllSubjects,
-    handleGetResources
+    handleGetResources,
+    handleGetDoubts
 }=require('./../services/studentService')
 
 
@@ -27,7 +28,20 @@ async function getResources(req, res, next){
   }
 };
 
+async function getDoubts(req, res, next){ //only for subject  page 
+  try {
+    const student_id=req.user_id
+    const school_id=req.school_id
+    const data=await handleGetDoubts(school_id,student_id)
+    res.status(200).json(data);
+
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports={
     getAllSubjects,
-    getResources
+    getResources,
+    getDoubts
 }
