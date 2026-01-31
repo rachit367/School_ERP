@@ -14,7 +14,7 @@ router.use(authenticateToken)
 router.get('/subjects',getAllSubjects)
 
 //req:subject_id  //res:_id,resources[]
-router.get('/subjects/resource',getResources)
+router.get('/subjects/resources',getResources)
 
 //req:  //res:{subject, doubt ,createdAt}
 router.get('/subjects/doubts',getDoubts)   //gives only oldest 3 doubts
